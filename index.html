@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <title>Incremental</title>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.color-2.1.2.min.js"></script>
+    <script type="text/javascript" src="js/equipment.js"></script>
+    <script type="text/javascript" src="js/entity.js"></script>
+    <script type="text/javascript" src="js/enemy.js"></script>
+    <script type="text/javascript" src="js/enemies/brute.js"></script>
+    <script type="text/javascript" src="js/armor.js"></script>
+    <script type="text/javascript" src="js/weapon.js"></script>
+    <script type="text/javascript" src="js/player.js"></script>
+    <script type="text/javascript" src="js/game.js"></script>
+
+    <link type="text/css" href="styles/styles.css" rel="stylesheet"  />
+  </head>
+  <body onload="var game = window.game;">
+    <div id="playerHealth" class="smallBar">
+      <div id="playerHealthBar" class="smallBar"></div>
+      <div id="playerHealthText" class="smallBar"></div>
+    </div>
+    <div id="playerCombatText" class="popupText"></div>
+
+    <div id="enemyHealth" class="smallBar">
+      <div id="enemyHealthBar" class="smallBar"></div>
+      <div id="enemyHealthText" class="smallBar"></div>
+    </div>
+    <div id="enemyCombatText" class="popupText"></div>
+    <br /><br /><br /><br /><br />
+    <input type="button" onclick="game.step();" value="Attack!" />
+  </body>
+</html>

@@ -1,0 +1,63 @@
+body {
+  font-family: "segoe ui", "lucida grande", tahoma, verdana, arial, helvetica, sans-serif;
+  font-size: 0.8125em;
+  line-height: 1.3em;
+  
+  margin: 0;
+  padding: 10px;
+}
+
+.smallBar {
+  position: absolute;
+  width: 150px;
+  height: 20px;
+}
+
+.popupText {
+  position: absolute;
+  width: 80px;
+  height: 20px;
+}
+
+#playerHealth {
+  top: 10px;
+  left: 10px;
+  background-color: black;
+}
+
+
+#playerHealthText {
+  text-align: center;
+  vertical-align: middle;
+  line-height: 20px;
+  color: white;
+}
+
+#playerCombatText {
+  vertical-align: middle;
+  line-height: 20px;
+  color: red;
+  top: 10px;
+  left: 170px;
+}
+
+#enemyHealth {
+  top: 40px;
+  left: 10px;
+  background-color: black;
+}
+
+#enemyHealthText {
+  text-align: center;
+  vertical-align: middle;
+  line-height: 20px;
+  color: white;
+}
+
+#enemyCombatText {
+  vertical-align: middle;
+  line-height: 20px;
+  color: red;
+  top: 40px;
+  left: 170px;
+}
