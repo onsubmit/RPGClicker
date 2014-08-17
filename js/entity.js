@@ -1,4 +1,6 @@
 function Entity() {
+  this.name = "";
+  
   this.level = 1;
   this.health = -1;
   this.maxHealth = 0;

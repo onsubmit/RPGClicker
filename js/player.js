@@ -1,30 +1,44 @@
 function Player() {
   this.inventory = [];
 
-  this.regen = 25.0;
+  this.regen = 100.0;
 
-  this.baseStrength = 4;
-  this.baseAgility = 2;
-  this.baseStamina = 8;
+  this.baseStrength = 8;
+  this.baseAgility = 6;
+  this.baseStamina = 20;
 
   this.baseDodgeChance    = 0.05;
   this.baseHitChance      = 0.9;
   this.baseCritChance     = 0.04;
   this.baseCritMultiplier = 2.0;
+
   this.gold = 0;
+  this.xp   = 0;
+  this.xpMax = 20;
 
   this.getAttributesWithGear();
 }
 Player.prototype = new Entity();
 
+Player.prototype.addXP = function(xpPercentage) {
+  this.xp += Math.round(this.xpMax * xpPercentage / 100);
+  if (this.xp >= this.xpMax) {
+    this.levelUp();
+  }
+}
+
 Player.prototype.levelUp = function() {
   Entity.prototype.levelUp.call(this);
   
-  this.baseStrength = this.baseStrength + 1;
-  this.baseAgility = this.baseAgility + 1;
-  this.baseStamina = this.baseStamina + 1;
+  this.baseStrength = this.baseStrength + this.level;
+  this.baseAgility = this.baseAgility + this.level;
+  this.baseStamina = this.baseStamina + this.level;
   
   this.getAttributesWithGear();
+
+  this.health = this.getMaxHealth();
+  this.xp = this.xp - this.xpMax;
+  this.xpMax = Math.round(this.xpMax * (1.8 + (this.level / 100)));
 }
 
 Player.prototype.regenHealth = function(intervalInMilliseconds) {

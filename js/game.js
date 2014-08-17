@@ -2,12 +2,15 @@ function Game()
 {
   this.player = new Player();
   this.enemy = this.makeEnemy();
+  this.enemyHealthShown = false;
+  this.experienceShown = false;
   setInterval(this.updateUI, 50);
 }
 
 Game.prototype.updateUI = function() {
-  var p = window.game.player;
-  var e = window.game.enemy;
+  var g = window.game;
+  var p = g.player;
+  var e = g.enemy;
   p.regenHealth(50);
   var healthWidth = Math.ceil(150 * p.health / p.maxHealth);
   var red = Math.floor(255 * (1 - healthWidth / 150));
@@ -21,7 +24,57 @@ Game.prototype.updateUI = function() {
   var green = Math.floor(192 * (healthWidth / 150));
   rgb = 'rgb(' + red + ', ' + green + ', 0)';
   $('#enemyHealthBar').width(healthWidth).css('background-color', rgb);
-  $('#enemyHealthText').text(Math.round(e.health) + ' / ' + e.maxHealth);
+
+  $('#enemyHealth').css('border-color', g.getEnemyDifficultyColor());
+  if (g.enemyHealthShown) {
+    $('#enemyHealthText').text(g.getEnemyHealthText());
+  }
+  else {
+    $('#enemyHealthText').text(g.getEnemyName());
+  }
+
+  var xpWidthPercentage = 100 * p.xp / p.xpMax;
+
+  $('#experienceBar').width(xpWidthPercentage + '%');
+
+  if (g.experienceShown) {
+    $('#experienceBarText').text(g.getPlayerExperienceText());
+  }
+  else {
+    $('#experienceBarText').text(g.getPlayerLevelText());
+  }
+}
+
+Game.prototype.getPlayerLevelText = function() {
+  return 'Level ' + this.player.level;
+}
+
+Game.prototype.getPlayerExperienceText = function() {
+  return Math.round(this.player.xp) + ' / ' + this.player.xpMax;
+}
+
+Game.prototype.getEnemyHealthText = function() {
+  return Math.round(this.enemy.health) + ' / ' + this.enemy.maxHealth;
+}
+
+Game.prototype.getEnemyName = function() {
+  return this.enemy.name + ' (' + this.enemy.level + ')';
+}
+
+Game.prototype.getEnemyDifficultyColor = function() {
+  switch (this.enemy.difficulty) {
+    case Quality.Poor :
+      return '#808080';
+    case Quality.Common :
+      return '#DDDDDD';
+    case Quality.Uncommon :
+      return '#00FF00';
+    case Quality.Rare :
+      return '#0000FF';
+    case Quality.Epic :
+      return '#CC00FF';
+
+  }
 }
 
 Game.prototype.updatePlayerCombatText = function(damage) {
@@ -112,6 +165,9 @@ Game.prototype.lootEnemy = function() {
   var gold = drops[0];
   this.player.gold += gold;
 
+  var xpPercentage = drops[1];
+  this.player.addXP(xpPercentage);
+
   var loot = drops[1];
   if (loot) {
     if (!this.player.gear[loot.slot]) {
@@ -134,26 +190,52 @@ Game.prototype.makeEnemy = function() {
     quality = Quality.Poor;
   }
   else {
-    quality = quality.Common;
+    quality = Quality.Common;
   }
 
   if (this.player.level > 4 && rand < 0.75) {
-    quality = quality.Uncommon;
+    quality = Quality.Uncommon;
   }
   else if (this.player.level > 9 && rand < 0.90) {
-    quality = quality.Rare;
+    quality = Quality.Rare;
   }
   else if (this.player.level > 19 && rand < 0.95) {
-    quality = quality.Epic;
+    quality = Quality.Epic;
   }
   else if (this.player.level > 29 && rand < 0.98) {
-    quality = quality.Legendary;
+    quality = Quality.Legendary;
   }
   else if (this.player.level > 59 && rand < 0.99) {
-    quality = quality.Artifact;
+    quality = Quality.Artifact;
   }
 
-  return (new Brute()).generateRandomEnemy(this.player.level, quality);
+  var index = Math.floor(Enemies.list.length * Math.random());
+  var enemy = Enemies.list[index];
+  return (new enemy()).generateRandomEnemy(this.player.level, quality);
 }
 
 var game = new Game();
+
+$(document).ready(function() {
+    $('#enemyHealthText').hover(
+      function() {
+        game.enemyHealthShown = true;
+        $(this).text(game.getEnemyHealthText())
+      },
+      function() {
+        game.enemyHealthShown = false;
+        $(this).text(game.getEnemyName())
+      }
+    );
+
+    $('#experienceBarText').hover(
+      function() {
+        game.experienceShown = true;
+        $(this).text(game.getPlayerExperienceText())
+      },
+      function() {
+        game.experienceShown = false;
+        $(this).text(game.getPlayerLevelText())
+      }
+    );
+});

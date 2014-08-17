@@ -52,6 +52,8 @@ Enemy.prototype.dropLoot = function() {
   var multiplier = this.level * (this.difficulty + 1);
   var gold =  multiplier + Math.round(multiplier * Math.random());
 
+  var xpPercentage = (20 / this.level) + 10 * Math.random();
+
   var numItemsToDrop = 0;
   var rand = Math.random();
   if (this.difficulty == Quality.Poor) {
@@ -71,5 +73,5 @@ Enemy.prototype.dropLoot = function() {
     loot = availableGear[index];
   }
 
-  return [gold, loot];
+  return [gold, xpPercentage, loot];
 }
