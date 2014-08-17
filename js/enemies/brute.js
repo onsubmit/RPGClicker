@@ -14,3 +14,7 @@ Brute.prototype.generateRandomEnemy = function(level, dropQuality) {
 Brute.prototype.generateRandomGear = function(level, averageQuality) {
   return Enemy.prototype.generateRandomGear.call(this, level, averageQuality);
 }
+
+Brute.prototype.dropLoot = function() {
+  return Enemy.prototype.dropLoot.call(this);
+}

@@ -1,4 +1,6 @@
 function Player() {
+  this.inventory = [];
+
   this.regen = 25.0;
 
   this.baseStrength = 4;
@@ -45,4 +47,30 @@ Player.prototype.getStamHealth = function() {
   
   // Stamina provides 1 health per stamina for the first 'jumpPoint' points of stamina, and 'multiplier' health per point of stamina thereafter.
   return this.stamina <= jumpPoint ? this.stamina : jumpPoint + multiplier * (this.stamina - jumpPoint);
+}
+
+Player.prototype.equipItem = function(item) {
+  if (!item) { return; }
+
+  if (this.gear[item.slot]) {
+    if (this.inventory.length < 25) {
+      this.inventory.push(this.gear[item.slot]);
+    }
+    else {
+      alert('Inventory full. Can\'t equip item');
+      return;
+    }
+  }
+
+  this.gear[item.slot] = item;
+  this.getAttributesWithGear();
+}
+
+Player.prototype.equipItemFromInventory = function(invetoryIndex) {
+  var item = this.inventory[inventoryIndex];
+  if (!item) { return; }
+
+  var temp = this.gear[item.slot];
+  this.gear[item.slot] = item;
+  this.inventory[inventoryIndex] = temp;
 }

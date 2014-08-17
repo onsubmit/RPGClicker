@@ -1,6 +1,7 @@
 function Enemy() {
   this.level          = 1;
   this.difficulty = Quality.Poor;
+  this.dropLoot = this.dropLoot();
 	
   this.baseStrength   = 0;
   this.baseAgility    = 0;
@@ -44,4 +45,31 @@ Enemy.prototype.generateRandomGear = function(level, averageQuality) {
   }
 
   return gear;
+}
+
+Enemy.prototype.dropLoot = function() {
+
+  var multiplier = this.level * (this.difficulty + 1);
+  var gold =  multiplier + Math.round(multiplier * Math.random());
+
+  var numItemsToDrop = 0;
+  var rand = Math.random();
+  if (this.difficulty == Quality.Poor) {
+    numItemsToDrop = rand < 0.7 ? 1 : 0;
+  }
+
+  var loot = null;
+  if (numItemsToDrop > 0) {
+    var availableGear = [];
+    for (var slot = 0; slot <= Slot.Max; slot++) {
+      if (this.gear[slot] != null) {
+        availableGear.push(this.gear[slot]);
+      }
+    }
+
+    var index = Math.floor(availableGear.length * Math.random());
+    loot = availableGear[index];
+  }
+
+  return [gold, loot];
 }

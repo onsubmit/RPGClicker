@@ -55,6 +55,7 @@ Game.prototype.attackEnemy = function() {
   console.log('Enemy: ' + this.enemy.health);
 
   if (this.enemy.isDead()) {
+      this.lootEnemy();
       this.enemy = this.makeEnemy();
       this.updateUI();
   }
@@ -96,6 +97,7 @@ Game.prototype.attackPlayer = function() {
     console.log('Player attacks for ' + damage + ' damage');
 
     if (this.enemy.isDead()) {
+        this.lootEnemy();
         this.enemy = this.makeEnemy();
         this.updateUI();
     }
@@ -103,6 +105,25 @@ Game.prototype.attackPlayer = function() {
 
   console.log('Player: ' + this.player.health);
   console.log('Enemy: ' + this.enemy.health);
+}
+
+Game.prototype.lootEnemy = function() {
+  var drops = this.enemy.dropLoot();
+  var gold = drops[0];
+  this.player.gold += gold;
+
+  var loot = drops[1];
+  if (loot) {
+    if (!this.player.gear[loot.slot]) {
+      this.player.equipItem(loot);
+    }
+    else if (this.player.inventory.length < 25) {
+      this.player.inventory.push(loot);
+    }
+    else {
+      alert('Inventory full. Can\'t loot item.');
+    }
+  }
 }
 
 Game.prototype.makeEnemy = function() {
