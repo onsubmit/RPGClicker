@@ -14,3 +14,16 @@ Weapon.prototype.generateRandomItem = function(slot, level, quality) {
 Weapon.prototype.getWeaponDamage = function() {
   return this.minDamage + (Math.round(this.maxDamage  * Math.random() - this.minDamage));
 }
+
+Weapon.prototype.generateName = function(slot, level, quality) {
+  return Equipment.prototype.generateName.call(this, slot, level, quality);
+}
+
+Weapon.prototype.getTooltipStatsTable = function(t) {
+  var t = $('<table/>', {
+              class: 'stats'
+            });
+
+  t.append(Equipment.getStatsRow('Damage', this.minDamage + ' - ' + this.maxDamage));
+  return Equipment.prototype.getTooltipStatsTable.call(this, t);
+}

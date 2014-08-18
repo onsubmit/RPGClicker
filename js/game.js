@@ -20,8 +20,9 @@ Game.prototype.updateUI = function() {
   var red = Math.floor(255 * (1 - healthWidth / 150));
   var green = Math.floor(192 * (healthWidth / 150));
   var rgb = 'rgb(' + red + ', ' + green + ', 0)';
+  var healthString = Math.round(p.health) + ' / ' + p.maxHealth;
   $('#playerHealthBar').width(healthWidth).css('background-color', rgb);
-  $('#playerHealthText').text(Math.round(p.health) + ' / ' + p.maxHealth);
+  $('#playerHealthText').text(healthString);
 
   healthWidth = Math.ceil(150 * e.health / e.maxHealth);
   var red = Math.floor(255 * (1 - healthWidth / 150));
@@ -50,6 +51,17 @@ Game.prototype.updateUI = function() {
   else {
     $('#experienceBarText').text(g.getPlayerLevelText());
   }
+
+  $('#statsHealth').text(healthString);
+  $('#statsMP5').text(p.regen);
+  $('#statsStamina').text(p.stamina);
+  $('#statsStrength').text(p.strength);
+  $('#statsAgility').text(p.agility);
+  $('#statsArmor').text(p.armor);
+  $('#statsHit').text((100 * p.hitChance).toFixed(2));
+  $('#statsDodge').text((100 * p.dodgeChance).toFixed(2));
+  $('#statsCrit').text((100 * p.critChance).toFixed(2));
+  $('#statsCritMult').text(p.critMultiplier.toFixed(2));
 }
 
 Game.prototype.getPlayerLevelText = function() {
@@ -204,7 +216,7 @@ Game.prototype.lootEnemy = function() {
     if (!this.player.gear[loot.slot]) {
       this.equipItem(loot);
     }
-    else if (this.player.inventory.length < 25) {
+    else if (!this.player.inventory.isFull()) {
       this.addItemToInventory(loot);
     }
     else {
@@ -214,12 +226,13 @@ Game.prototype.lootEnemy = function() {
 }
 
 Game.prototype.addItemToInventory = function(item) {
-  this.player.inventory.push(item);
-  this.displayItemInInventory(item);
+  var index = this.player.inventory.add(item);
+  if (index >= 0) {
+    this.displayItemInInventory(index, item);
+  }
 }
 
-Game.prototype.displayItemInInventory = function(item) {
-  var index = this.player.inventory.length - 1;
+Game.prototype.displayItemInInventory = function(index, item) {
   var selector = '#i' + index + ' div';
   var icon = item.getIcon();
   $(selector).replaceWith(icon);

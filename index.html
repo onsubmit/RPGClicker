@@ -8,6 +8,7 @@
     <script type="text/javascript" src="js/enemies.js"></script>
     <script type="text/javascript" src="js/armor.js"></script>
     <script type="text/javascript" src="js/weapon.js"></script>
+    <script type="text/javascript" src="js/inventory.js"></script>
     <script type="text/javascript" src="js/player.js"></script>
     <script type="text/javascript" src="js/game.js"></script>
 
@@ -21,14 +22,10 @@
 
     <div id="container">
       <div id="character">
-        <table id="characterTable" border="0" cellspacing="0" cellpadding="0">
+        <table class="itemTable" border="0" cellspacing="0" cellpadding="0">
           <tr>
             <td id="c0"><div></div></td>
             <td rowspan="5" colspan="2"></td>
-            <td id="c5"><div></div></td>
-          </tr>
-          <tr>
-            <td id="c9"><div></div></td>
             <td id="c6"><div></div></td>
           </tr>
           <tr>
@@ -41,52 +38,113 @@
           </tr>
           <tr>
             <td id="c3"><div></div></td>
-            <td id="c10"><div></div></td>
+            <td id="c9"><div></div></td>
           </tr>
           <tr>
             <td id="c4"><div></div></td>
+            <td id="c10"><div></div></td>
+          </tr>
+          <tr>
+            <td id="c5"><div></div></td>
             <td id="c12"><div></div></td>
             <td id="c13"><div></div></td>
-            <td id="c111"><div></div></td>
+            <td id="c11"><div></div></td>
           </tr>
         </table>
+        <div>
+          <table class="stats">
+            <tr>
+              <td class="alignRight">Health:</td>
+              <td id="statsHealth"></td>
+            </tr>
+            <tr>
+              <td class="alignRight">HP5:</td>
+              <td id="statsMP5"></td>
+            </tr>
+            <tr>
+              <td class="alignRight">Stamina:</td>
+              <td id="statsStamina"></td>
+            </tr>
+            <tr>
+              <td class="alignRight">Strength:</td>
+              <td id="statsStrength"></td>
+            </tr>
+            <tr>
+              <td class="alignRight">Agility:</td>
+              <td id="statsAgility"></td>
+            </tr>
+            <tr>
+              <td class="alignRight">Armor:</td>
+              <td id="statsArmor"></td>
+            </tr>
+            <tr>
+              <td class="alignRight">Hit %:</td>
+              <td id="statsHit"></td>
+            </tr>
+            <tr>
+              <td class="alignRight">Dodge %:</td>
+              <td id="statsDodge"></td>
+            </tr>
+            <tr>
+              <td class="alignRight">Crit %:</td>
+              <td id="statsCrit"></td>
+            </tr>
+            <tr>
+              <td class="alignRight">Crit Mult:</td>
+              <td id="statsCritMult"></td>
+            </tr>
+          </table>
+        </div>
       </div>
       <div id="inventory">
-        <table id="inventoryTable" border="0" cellspacing="0" cellpadding="0">
+        <table class="itemTable" border="0" cellspacing="0" cellpadding="0">
           <tr>
             <td id="i0"><div></div></td>
             <td id="i1"><div></div></td>
             <td id="i2"><div></div></td>
             <td id="i3"><div></div></td>
             <td id="i4"><div></div></td>
+            <td id="i5"><div></div></td>
           </tr>
           <tr>
-            <td id="i5"><div></div></td>
             <td id="i6"><div></div></td>
             <td id="i7"><div></div></td>
             <td id="i8"><div></div></td>
             <td id="i9"><div></div></td>
-          </tr>
-          <tr>
             <td id="i10"><div></div></td>
             <td id="i11"><div></div></td>
+          </tr>
+          <tr>
             <td id="i12"><div></div></td>
             <td id="i13"><div></div></td>
             <td id="i14"><div></div></td>
-          </tr>
-          <tr>
             <td id="i15"><div></div></td>
             <td id="i16"><div></div></td>
             <td id="i17"><div></div></td>
-            <td id="i18"><div></div></td>
-            <td id="i19"><div></div></td>
           </tr>
           <tr>
+            <td id="i18"><div></div></td>
+            <td id="i19"><div></div></td>
             <td id="i20"><div></div></td>
             <td id="i21"><div></div></td>
             <td id="i22"><div></div></td>
             <td id="i23"><div></div></td>
+          </tr>
+          <tr>
             <td id="i24"><div></div></td>
+            <td id="i25"><div></div></td>
+            <td id="i26"><div></div></td>
+            <td id="i27"><div></div></td>
+            <td id="i28"><div></div></td>
+            <td id="i29"><div></div></td>
+          </tr>
+          <tr>
+            <td id="i30"><div></div></td>
+            <td id="i31"><div></div></td>
+            <td id="i32"><div></div></td>
+            <td id="i33"><div></div></td>
+            <td id="i34"><div></div></td>
+            <td id="i35"><div></div></td>
           </tr>
           </table>
       </div>

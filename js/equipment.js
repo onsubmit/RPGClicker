@@ -89,6 +89,7 @@ Equipment.getAttributeTypes = function(slot, quality) {
         index = Math.floor(baseAttributes.length * Math.random());
       }
     }
+
     attributes.push(baseAttributes.splice(index, 1));
   }
   
@@ -96,7 +97,7 @@ Equipment.getAttributeTypes = function(slot, quality) {
 }
 
 Equipment.prototype.generateRandomItem = function(slot, level, quality) {
-  this.name = slot;
+  this.name = this.generateName(slot, level, quality);
   this.slot = slot;
   this.quality = quality;
   
@@ -116,7 +117,7 @@ Equipment.prototype.generateRandomItem = function(slot, level, quality) {
         this.stamina = baseStat + Math.round(level * Math.random());
         break;
       case Attributes.ExtraArmor:
-        this.m_hasExtraArmor = true;
+        this.hasExtraArmor = true;
         this.armor += baseStat + Math.round(level * Math.random());
         break;
       case Attributes.DodgeChance:
@@ -137,6 +138,94 @@ Equipment.prototype.generateRandomItem = function(slot, level, quality) {
   return this;
 }
 
+Equipment.prototype.generateName = function(slot, level, quality) {
+  var prefixes = [];
+  var suffixes = [];
+  switch (quality) {
+    case Quality.Poor :
+      prefixes = ['Appalling', 'Broken', 'Defective', 'Embarassing', 'Laughable', 'Shameful', 'Shattered', 'Shitty' ];
+      suffixes = ['Apathy', 'Idiocy', 'Ignorance', 'Flatulence'];
+      break;
+    case Quality.Common :
+      prefixes = ['Decent', 'Inferior', 'Lowly', 'Mediocre', 'Plain', 'Simple'];
+      suffixes = ['Civility', 'Dignity', 'Contentment', 'Normality'];
+      break;
+    case Quality.Uncommon :
+      prefixes = ['Acceptable', 'Great', 'Satisfactory', 'Worthy'];
+      suffixes = ['Intensity', 'Potency', 'Strength', 'Force'];
+      break;
+    case Quality.Rare :
+      prefixes = ['Awesome', 'Fascinating', 'Incredible', 'Marvelous', 'Stunning'];
+      suffixes = ['Dynanism', 'Endurance', 'Urgency', 'Vitality'];
+      break;
+    case Quality.Epic :
+      prefixes = ['Epic', 'Heroic', 'Intimidating', 'Magnificent'];
+      suffixes = ['Astonishment', 'Horror', 'Shock', 'Wonderment'];
+      break;
+    case Quality.Legendary :
+      prefixes = ['Illustrious', 'Legendary', 'Mythical', 'Renowned'];
+      suffixes = ['Authority', 'Greatness', 'Luster', 'Power'];
+      break;
+    case Quality.Artifact :
+      prefixes = ['Ludicrous', 'Impossible', 'Ridiculous', 'Unbelievable'];
+      suffixes = ['Prestige', 'Significance', 'Superiority'];
+      break;
+  }
+
+  var names = []
+  switch (slot) {
+    case Slot.Head :
+      names = ['Hat', 'Headgear', 'Helmet', 'Shako'];
+      break;
+    case Slot.Shoulder :
+      names = ['Mantle', 'Pauldrons', 'Shoulderplates', 'Shoulders', 'Spaulders'];
+      break;
+    case Slot.Chest :
+      names = ['Breastplate', 'Carapace', 'Chestguard', 'Chestpiece', 'Chestplate' ];
+      break;
+    case Slot.Back :
+      names = ['Cape', 'Cloak', 'Drape', 'Wrap'];
+      break;
+    case Slot.Wrist :
+      names = ['Armplates', 'Bracers', 'Wristplates', 'Shackles', 'Vambraces'];
+      break;
+    case Slot.Hands :
+      names = ['Gauntlets', 'Fists', 'Gloves', 'Grips', 'Mitts'];
+      break;
+    case Slot.Waist :
+      names = ['Belt', 'Clasp', 'Girdle', 'Girth', 'Waistband'];
+      break;
+    case Slot.Legs :
+      names = ['Greaves', 'Leggaurds', 'Legplates', 'Pants'];
+      break;
+    case Slot.Feet :
+      names = ['Boots', 'Shoes', 'Stompers', 'Treads'];
+      break;
+    case Slot.Neck :
+      names = ['Amulet', 'Chain', 'Choker', 'Locket', 'Necklace', 'Pearls', 'Pendant', 'Strand'];
+      break;
+    case Slot.Trinket1 :
+    case Slot.Trinket2 :
+      names = ['Diamond', 'Crystal', 'Eyeball', 'Rock', 'Sigil', 'Talisman', 'Vial'];
+      break;
+    case Slot.MainHand :
+    case Slot.OffHand :
+      names = ['Axe', 'Blade', 'Cleaver', 'Knife', 'Hacker', 'Ripper', 'Saber', 'Scalpel', 'Scimitar', 'Sword'];
+      break;
+  }
+
+  var index = Math.floor(prefixes.length * Math.random());
+  var prefix = prefixes[index];
+
+  index = Math.floor(names.length * Math.random());
+  var name = names[index];
+
+  index = Math.floor(suffixes.length * Math.random());
+  var suffix = suffixes[index];
+
+  return prefix + " " + name + " of " + suffix;
+}
+
 Equipment.prototype.getIcon = function() {
   if (!this.icon) {
 
@@ -145,7 +234,7 @@ Equipment.prototype.getIcon = function() {
     var d = $('<div/>', {
               class: 'item',
               style: 'border: 2px solid ' + borderColor,
-              text: this.name
+              text: this.slot
           });
 
     var showToolip = function(item, e) {
@@ -186,11 +275,67 @@ Equipment.prototype.getTooltip = function() {
 
     var d = $('<div/>', {
               class: 'tooltip',
-              style: 'border: 2px solid ' + borderColor,
-              text: 'Awesome item for slot ' + this.slot
-          });
+              style: 'border: 2px solid ' + borderColor
+            }).append(
+              $('<div/>', {
+                  style: 'color: ' + borderColor,
+                  text: this.name
+              })
+            ).append(this.getTooltipStatsTable());
   }
 
   this.tooltip = d;
   return this.tooltip;
+}
+
+Equipment.getStatsRow = function(label, value, style) {
+  var r = $('<tr/>').append(
+            $('<td/>', {
+              text: label + ':',
+              class: 'alignRight'
+            })
+          ).append(
+            $('<td/>', {
+              text: value,
+              style: style || ''
+            })
+          );
+
+  return r;
+}
+
+Equipment.prototype.getTooltipStatsTable = function(t) {
+    t = t || $('<table/>', {
+                class: 'stats'
+              });
+
+    if (this.stamina > 0) {
+      t.append(Equipment.getStatsRow('Stamina', this.stamina));
+    }
+
+    if (this.strength > 0) {
+      t.append(Equipment.getStatsRow('Strength', this.strength));
+    }
+
+    if (this.agility > 0) {
+      t.append(Equipment.getStatsRow('Agility', this.agility));
+    }
+
+    if (this.dodgeChance > 0) {
+      t.append(Equipment.getStatsRow('Dodge %', (100 * this.dodgeChance).toFixed(2)));
+    }
+
+    if (this.hitChance > 0) {
+      t.append(Equipment.getStatsRow('Hit %', (100 * this.hitChance).toFixed(2)));
+    }
+
+    if (this.critChance > 0) {
+      t.append(Equipment.getStatsRow('Crit %', (100 * this.critChance).toFixed(2)));
+    }
+
+    if (this.critMultiplier > 0) {
+      t.append(Equipment.getStatsRow('Crit Mult', this.critMultiplier.toFixed(2)));
+    }
+
+    return t;
 }

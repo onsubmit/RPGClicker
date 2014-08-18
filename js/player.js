@@ -1,5 +1,5 @@
 function Player() {
-  this.inventory = [];
+  this.inventory = new Inventory();
 
   this.regen = 150.0;
 
