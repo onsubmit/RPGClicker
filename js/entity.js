@@ -90,31 +90,40 @@ Entity.prototype.getStamHealth = function() {
   return this.stamina <= jumpPoint ? this.stamina : jumpPoint + multiplier * (this.stamina - jumpPoint);
 }
 
-Entity.prototype.attack = function(enemy) {
-  if (Math.random() >= this.hitChance + enemy.dodgeChance) {
-    return 0;
+Entity.prototype.attack = function(enemy, damageModifier) {
+  if (Math.random() > this.hitChance) {
+    return [0, 'Missed'];
+  }
+
+  if (Math.random() < enemy.dodgeChance) {
+    return [0, 'Dodged'];
   }
 
   var damage = 0;
+  var status = 'Hit';
   var attackPower = this.level + (2 * this.strength);
   damage = damage + attackPower + this.getWeaponDamage(this.gear[Slot.MainHand]);
 
+  var critAmount = 0;
   if (Math.random() <= this.critChance) {
-    damage = damage * this.critMultiplier;
+    critAmount = damage * (this.critMultiplier - 1);
+    damage = damage + critAmount;
+    status = 'Crit'
   }
 
   var damageReductionPercentage = enemy.armor / (enemy.level * (enemy.difficulty + 1) * 64);
+  damageReductionPercentage = damageReductionPercentage * Math.max(1, 64 * (enemy.level - this.level));
 
-  if (this.level > enemy.level) {
-    damageReductionPercentage = damageReductionPercentage - damageReductionPercentage * enemy.level / this.level;
-  }
-  else if (this.level < enemy.level){
-    damageReductionPercentage = damageReductionPercentage + damageReductionPercentage * this.level / enemy.level;
+  damage = damage * (1 - damageReductionPercentage);
+
+  if (damageModifier) {
+    damage *= damageModifier;
   }
 
-  damage = Math.round(damage * (1 - damageReductionPercentage));
+  damage = Math.round(damage);
+
   enemy.takeDamage(damage);
-  return damage;
+  return [damage, status, critAmount];
 }
 
 Entity.prototype.getWeaponDamage = function(weapon) {

@@ -111,7 +111,7 @@ Equipment.prototype.generateRandomItem = function(slot, level, quality) {
         break;
       case Attributes.ExtraArmor:
         this.m_hasExtraArmor = true;
-        item.armor += baseStat + Math.round(level * Math.random());
+        this.armor += baseStat + Math.round(level * Math.random());
         break;
       case Attributes.DodgeChance:
         this.dodgeChance = 0.005 + 0.025 * Math.random();

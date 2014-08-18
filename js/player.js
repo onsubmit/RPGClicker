@@ -1,11 +1,11 @@
 function Player() {
   this.inventory = [];
 
-  this.regen = 100.0;
+  this.regen = 150.0;
 
-  this.baseStrength = 8;
-  this.baseAgility = 6;
-  this.baseStamina = 20;
+  this.baseStrength = 2;
+  this.baseAgility = 5;
+  this.baseStamina = 5;
 
   this.baseDodgeChance    = 0.05;
   this.baseHitChance      = 0.9;

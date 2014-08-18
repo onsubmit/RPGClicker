@@ -14,25 +14,36 @@
     <link type="text/css" href="styles/styles.css" rel="stylesheet"  />
   </head>
   <body>
-    <div id="playerHealth" class="smallBar">
-      <div id="playerHealthBar" class="smallBar"></div>
-      <div id="playerHealthText" class="smallBar smallBarText"></div>
+    <div id="experience" class="fullWidthBar snappedTopBar">
+      <div id="experienceBar" class="snappedTopBar fullWidthBar"></div>
+      <div id="experienceBarText" class="snappedTopBar fullWidthBar smallBarText"></div>
     </div>
-    <div id="playerCombatText" class="popupText"></div>
+    <div id="container">
+      <div class="healthContainer">
+        <div id="playerCombatText" class="popupText"></div>
+        <div id="playerHealth" class="smallBar">
+          <div id="playerHealthBar" class="smallBar">
+            <div id="playerHealthText" class="smallBar smallBarText"></div>
+          </div>
+        </div>
+      </div>
 
-    <div id="enemyHealth" class="smallBar">
-      <div id="enemyHealthBar" class="smallBar"></div>
-      <div id="enemyHealthText" class="smallBar smallBarText"></div>
+      <div class="healthContainer">
+        <div id="enemyCombatText" class="popupText"></div>
+        <div id="enemyHealth" class="smallBar">
+          <div id="enemyHealthBar" class="smallBar">
+            <div id="enemyHealthText" class="smallBar smallBarText"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="actions">
+        <input id="attack" type="button" onclick="game.step();" value="Attack!" /><input id="run" type="button" onclick="game.runAway();" value="Run!" /><br />
+        <div id="enemyLevelContainer" style="display: none;">
+          <label for="enemyLevel">Next enemy level:</label>
+          <span id="enemyLevelDropdownContainer"><select id="enemyLevel"></select></span>
+        </div>
+      </div>
     </div>
-    <div id="enemyCombatText" class="popupText"></div>
-
-
-    <div id="experience" class="fullWidthBar snappedBottomBar">
-      <div id="experienceBar" class="snappedBottomBar fullWidthBar"></div>
-      <div id="experienceBarText" class="snappedBottomBar fullWidthBar smallBarText"></div>
-    </div>
-
-    <br /><br /><br /><br /><br />
-    <input type="button" onclick="game.step();" value="Attack!" />
   </body>
 </html>

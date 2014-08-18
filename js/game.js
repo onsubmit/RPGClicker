@@ -1,9 +1,13 @@
 function Game()
 {
+  this.enemyDamageModifier = 0.1;
+
   this.player = new Player();
+  this.enemyLevel = this.player.level;
   this.enemy = this.makeEnemy();
   this.enemyHealthShown = false;
   this.experienceShown = false;
+  this.experienceAnimationNeeded = false;
   setInterval(this.updateUI, 50);
 }
 
@@ -35,7 +39,10 @@ Game.prototype.updateUI = function() {
 
   var xpWidthPercentage = 100 * p.xp / p.xpMax;
 
-  $('#experienceBar').width(xpWidthPercentage + '%');
+  if (this.experienceAnimationNeeded) {
+    this.experienceAnimationNeeded = false;
+    $('#experienceBar').animate({ width: xpWidthPercentage + '%' }, 500);
+  }
 
   if (g.experienceShown) {
     $('#experienceBarText').text(g.getPlayerExperienceText());
@@ -73,22 +80,49 @@ Game.prototype.getEnemyDifficultyColor = function() {
       return '#0000FF';
     case Quality.Epic :
       return '#CC00FF';
-
   }
 }
 
+
 Game.prototype.updatePlayerCombatText = function(damage) {
-  $('#playerCombatText').show().text(damage > 0 ? '-' + damage : 'Miss!').fadeOut(200, function() { $(this).text(''); });
+  this.updateCombatText('playerCombatText', damage);
 }
 
 Game.prototype.updateEnemyCombatText = function(damage) {
-  $('#enemyCombatText').show().text(damage > 0 ? '-' + damage : 'Miss!').fadeOut(200, function() { $(this).text(''); });
+  this.updateCombatText('enemyCombatText', damage);
+}
+
+Game.prototype.clearCombatText = function() {
+  this.updateCombatText('playerCombatText');
+  this.updateCombatText('enemyCombatText');
+}
+
+Game.prototype.updateCombatText = function(id, damage) {
+    if (!damage) {
+      $('#' + id).text('');
+      return;
+    }
+
+    var value = damage[0];
+    var state = damage[1];
+    var critValue = damage[2];
+
+    if (value > 0) {
+      $('#' + id).text(value).css('font-weight', critValue > 0 ? 'bold' : 'normal');
+    }
+    else {
+      $('#' + id).text(state).css('font-weight', 'normal');
+    }
+}
+
+Game.prototype.runAway = function() {
+  this.enemy = this.makeEnemy();
+  this.clearCombatText();
+  this.updateUI();
 }
 
 Game.prototype.step = function() {
   this.updateUI();
-  console.log('Player: ' + this.player.health);
-  console.log('Enemy: ' + this.enemy.health);
 
   var playerAttackFirst = Math.random() > 0.5;
 
@@ -103,9 +137,6 @@ Game.prototype.step = function() {
 Game.prototype.attackEnemy = function() {
   var damage = this.player.attack(this.enemy);
   this.updateEnemyCombatText(damage);
-  console.log('Player attacks for ' + damage + ' damage');
-  console.log('Player: ' + this.player.health);
-  console.log('Enemy: ' + this.enemy.health);
 
   if (this.enemy.isDead()) {
       this.lootEnemy();
@@ -113,33 +144,28 @@ Game.prototype.attackEnemy = function() {
       this.updateUI();
   }
   else {
-    damage = this.enemy.attack(this.player);
+    damage = this.enemy.attack(this.player, this.enemyDamageModifier);
     this.updatePlayerCombatText(damage);
-    console.log('Enemy attacks for ' + damage + ' damage');
 
     if (this.player.isDead()) {
       if (confirm("You died. Play again?")) {
         this.player = new Player();
+        this.enemyLevel = this.player.level;
         this.enemy = this.makeEnemy();
         this.updateUI();
       }
     }
   }
-
-  console.log('Player: ' + this.player.health);
-  console.log('Enemy: ' + this.enemy.health);
 }
 
 Game.prototype.attackPlayer = function() {
-  var damage = this.enemy.attack(this.player);
+  var damage = this.enemy.attack(this.player, this.enemyDamageModifier);
   this.updatePlayerCombatText(damage);
-  console.log('Enemy attacks for ' + damage + ' damage');
-  console.log('Player: ' + this.player.health);
-  console.log('Enemy: ' + this.enemy.health);
 
   if (this.player.isDead()) {
     if (confirm("You died. Play again?")) {
       this.player = new Player();
+      this.enemyLevel = this.player.level;
       this.enemy = this.makeEnemy();
       this.updateUI();
     }
@@ -147,7 +173,6 @@ Game.prototype.attackPlayer = function() {
   else {
     damage = this.player.attack(this.enemy);
     this.updateEnemyCombatText(damage);
-    console.log('Player attacks for ' + damage + ' damage');
 
     if (this.enemy.isDead()) {
         this.lootEnemy();
@@ -155,9 +180,10 @@ Game.prototype.attackPlayer = function() {
         this.updateUI();
     }
   }
+}
 
-  console.log('Player: ' + this.player.health);
-  console.log('Enemy: ' + this.enemy.health);
+Game.prototype.setEnemyLevel = function(level) {
+  this.enemyLevel = level;  
 }
 
 Game.prototype.lootEnemy = function() {
@@ -165,8 +191,30 @@ Game.prototype.lootEnemy = function() {
   var gold = drops[0];
   this.player.gold += gold;
 
+  var oldLevel = this.player.level;
   var xpPercentage = drops[1];
+
+  var penalties = [1, 0.4, 0.1];
+  var lvlDifference = this.player.level - this.enemy.level;
+  xpPercentage *= (lvlDifference > 2 ? 0 : penalties[lvlDifference]);
+
   this.player.addXP(xpPercentage);
+  this.experienceAnimationNeeded = true;
+
+  if (this.player.level > oldLevel) {
+    var s = $('<select />');
+
+    for (var i = this.player.level; i > 0 && i > this.player.level - 4; i--) {
+      $('<option />', {value: i, text: i}).appendTo(s);
+    }
+
+    this.enemyLevel = this.player.level;
+    s.val(this.player.level);
+    s.change(function() { window.game.setEnemyLevel(parseInt($(this).val())) });
+    $('#enemyLevelDropdownContainer').html(s);
+    $('#enemyLevelContainer').show();
+  }
+
 
   var loot = drops[1];
   if (loot) {
@@ -193,7 +241,7 @@ Game.prototype.makeEnemy = function() {
     quality = Quality.Common;
   }
 
-  if (this.player.level > 4 && rand < 0.75) {
+  if (this.player.level > 4 && rand < 0.30) {
     quality = Quality.Uncommon;
   }
   else if (this.player.level > 9 && rand < 0.90) {
@@ -211,7 +259,7 @@ Game.prototype.makeEnemy = function() {
 
   var index = Math.floor(Enemies.list.length * Math.random());
   var enemy = Enemies.list[index];
-  return (new enemy()).generateRandomEnemy(this.player.level, quality);
+  return (new enemy()).generateRandomEnemy(this.enemyLevel, quality);
 }
 
 var game = new Game();

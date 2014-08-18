@@ -6,6 +6,11 @@ function Enemy() {
   this.baseStrength   = 0;
   this.baseAgility    = 0;
   this.baseStamina    = 0;
+
+  this.baseDodgeChance    = 0.025;
+  this.baseHitChance      = 0.8;
+  this.baseCritChance     = 0.02;
+  this.baseCritMultiplier = 1.5;
 }
 Enemy.prototype = new Entity();
 
@@ -52,7 +57,7 @@ Enemy.prototype.dropLoot = function() {
   var multiplier = this.level * (this.difficulty + 1);
   var gold =  multiplier + Math.round(multiplier * Math.random());
 
-  var xpPercentage = (20 / this.level) + 10 * Math.random();
+  var xpPercentage = (this.difficulty + 2) * (40 + 10 * Math.random()) / (this.level + 4);
 
   var numItemsToDrop = 0;
   var rand = Math.random();

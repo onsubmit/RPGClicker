@@ -5,9 +5,12 @@ body {
   margin: 0;
 }
 
+#container {
+  margin-top: 30px;
+  margin-left: 10px;
+}
+
 #playerHealth {
-  top: 10px;
-  left: 10px;
   background-color: black;
   border: 2px solid black;
 }
@@ -16,13 +19,9 @@ body {
   vertical-align: middle;
   line-height: 20px;
   color: red;
-  top: 10px;
-  left: 170px;
 }
 
 #enemyHealth {
-  top: 40px;
-  left: 10px;
   background-color: black;
   border: 2px solid white;
 }
@@ -31,8 +30,6 @@ body {
   vertical-align: middle;
   line-height: 20px;
   color: red;
-  top: 40px;
-  left: 170px;
 }
 
 #experience {
@@ -53,9 +50,9 @@ body {
 }
 
 .smallBar {
-  position: absolute;
   width: 150px;
   height: 20px;
+  margin-bottom: 10px;
 }
 
 .smallBarText {
@@ -65,10 +62,11 @@ body {
   color: white;
   font-weight: bold;
   text-shadow: 1px 1px 1px #000;
+  position: absolute;
 }
 
 .popupText {
-  position: absolute;
+  float: right;
   width: 80px;
   height: 20px;
 }
@@ -80,7 +78,11 @@ body {
   margin-right: auto;
 }
 
-.snappedBottomBar {
+.snappedTopBar {
   position: absolute;
-  bottom: 0;
+  top: 0;
+}
+
+.healthContainer {
+  width: 240px;
 }
