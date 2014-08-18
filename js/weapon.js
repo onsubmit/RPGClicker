@@ -6,7 +6,7 @@ Weapon.prototype = new Equipment();
 
 Weapon.prototype.generateRandomItem = function(slot, level, quality) {
   Equipment.prototype.generateRandomItem.call(this, slot, level, quality);
-  this.minDamage = level * (quality + 1) + Math.round(level * Math.random());
+  this.minDamage = 4 + level * (quality + 1) + Math.round(level * Math.random());
   this.maxDamage = this.minDamage + 2 * level;
   return this;
 }

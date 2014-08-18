@@ -29,7 +29,7 @@ Game.prototype.updateUI = function() {
   rgb = 'rgb(' + red + ', ' + green + ', 0)';
   $('#enemyHealthBar').width(healthWidth).css('background-color', rgb);
 
-  $('#enemyHealth').css('border-color', g.getEnemyDifficultyColor());
+  $('#enemyHealth').css('border-color', Entity.getDifficultyColor(e.difficulty));
   if (g.enemyHealthShown) {
     $('#enemyHealthText').text(g.getEnemyHealthText());
   }
@@ -67,22 +67,6 @@ Game.prototype.getEnemyHealthText = function() {
 Game.prototype.getEnemyName = function() {
   return this.enemy.name + ' (' + this.enemy.level + ')';
 }
-
-Game.prototype.getEnemyDifficultyColor = function() {
-  switch (this.enemy.difficulty) {
-    case Quality.Poor :
-      return '#808080';
-    case Quality.Common :
-      return '#DDDDDD';
-    case Quality.Uncommon :
-      return '#00FF00';
-    case Quality.Rare :
-      return '#0000FF';
-    case Quality.Epic :
-      return '#CC00FF';
-  }
-}
-
 
 Game.prototype.updatePlayerCombatText = function(damage) {
   this.updateCombatText('playerCombatText', damage);
@@ -183,13 +167,13 @@ Game.prototype.attackPlayer = function() {
 }
 
 Game.prototype.setEnemyLevel = function(level) {
-  this.enemyLevel = level;  
+  this.enemyLevel = level;
 }
 
 Game.prototype.lootEnemy = function() {
   var drops = this.enemy.dropLoot();
-  var gold = drops[0];
-  this.player.gold += gold;
+  var money = drops[0];
+  this.player.money += money;
 
   var oldLevel = this.player.level;
   var xpPercentage = drops[1];
@@ -215,14 +199,13 @@ Game.prototype.lootEnemy = function() {
     $('#enemyLevelContainer').show();
   }
 
-
-  var loot = drops[1];
+  var loot = drops[2];
   if (loot) {
     if (!this.player.gear[loot.slot]) {
-      this.player.equipItem(loot);
+      this.equipItem(loot);
     }
     else if (this.player.inventory.length < 25) {
-      this.player.inventory.push(loot);
+      this.addItemToInventory(loot);
     }
     else {
       alert('Inventory full. Can\'t loot item.');
@@ -230,30 +213,56 @@ Game.prototype.lootEnemy = function() {
   }
 }
 
+Game.prototype.addItemToInventory = function(item) {
+  this.player.inventory.push(item);
+  this.displayItemInInventory(item);
+}
+
+Game.prototype.displayItemInInventory = function(item) {
+  var index = this.player.inventory.length - 1;
+  var selector = '#i' + index + ' div';
+  var icon = item.getIcon();
+  $(selector).replaceWith(icon);
+}
+
+Game.prototype.equipItem = function(item) {
+  var itemMovedToInventory = this.player.equipItem(item);
+
+  if (itemMovedToInventory) {
+    this.displayItemInInventory(item);
+  }
+  else {
+    var selector = '#c' + item.slot + ' div';
+    var icon = item.getIcon();
+    $(selector).replaceWith(icon);
+  }
+}
+
+
 Game.prototype.makeEnemy = function() {
   var quality = Quality.Poor;
   var rand = Math.random();
 
-  if (this.player.level < 3 || rand < 0.2) {
+  if (this.player.level < 3) {
     quality = Quality.Poor;
   }
   else {
     quality = Quality.Common;
   }
 
-  if (this.player.level > 4 && rand < 0.30) {
+  if (this.player.level > 3 && rand < 0.5) {
     quality = Quality.Uncommon;
   }
-  else if (this.player.level > 9 && rand < 0.90) {
+  else if (this.player.level > 6 && rand < 0.75) {
     quality = Quality.Rare;
   }
-  else if (this.player.level > 19 && rand < 0.95) {
+  else if (this.player.level > 13 && rand < 0.9) {
     quality = Quality.Epic;
   }
-  else if (this.player.level > 29 && rand < 0.98) {
+  else if (this.player.level > 19 && rand < 0.98) {
     quality = Quality.Legendary;
   }
-  else if (this.player.level > 59 && rand < 0.99) {
+  else if (this.player.level > 29) {
     quality = Quality.Artifact;
   }
 

@@ -7,7 +7,8 @@ body {
 
 #container {
   margin-top: 30px;
-  margin-left: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 #playerHealth {
@@ -49,6 +50,47 @@ body {
   text-align: center;
 }
 
+
+
+#inventory {
+  float: right;
+  margin-right: 5px;
+  background-color: black;
+}
+
+#inventoryTable td {
+  height: 48px;
+  width: 48px;
+  background-color: #666;
+}
+
+#inventoryTable td .item {
+  height: 44px;
+  width: 44px;
+}
+
+#character {
+  float: right;
+  background-color: #666;
+  background-color: black;
+}
+
+#characterTable td {
+  height: 40px;
+  width: 40px;
+  background-color: #666;
+}
+
+#characterTable td .item {
+  height: 35px;
+  width: 35px;
+}
+
+
+
+
+
+
 .smallBar {
   width: 150px;
   height: 20px;
@@ -85,4 +127,14 @@ body {
 
 .healthContainer {
   width: 240px;
+}
+
+.item .tooltip {
+  position: fixed;
+  width: 200px;
+  height: 300px;
+  background: #06F;
+  opacity: 0.95;
+  z-index: 10;
+  display: none;
 }

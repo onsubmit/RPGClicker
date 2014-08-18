@@ -12,7 +12,7 @@ function Player() {
   this.baseCritChance     = 0.04;
   this.baseCritMultiplier = 2.0;
 
-  this.gold = 0;
+  this.money = 0;
   this.xp   = 0;
   this.xpMax = 20;
 
@@ -66,9 +66,12 @@ Player.prototype.getStamHealth = function() {
 Player.prototype.equipItem = function(item) {
   if (!item) { return; }
 
+  var itemMovedToInventory = false;
+
   if (this.gear[item.slot]) {
     if (this.inventory.length < 25) {
       this.inventory.push(this.gear[item.slot]);
+      itemMovedToInventory = true;
     }
     else {
       alert('Inventory full. Can\'t equip item');
@@ -78,6 +81,8 @@ Player.prototype.equipItem = function(item) {
 
   this.gear[item.slot] = item;
   this.getAttributesWithGear();
+
+  return itemMovedToInventory;
 }
 
 Player.prototype.equipItemFromInventory = function(invetoryIndex) {

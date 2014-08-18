@@ -143,3 +143,18 @@ Entity.prototype.heal = function(amount) {
   this.health = Math.min(this.maxHealth, this.health + amount);
   return this;
 }
+
+Entity.getDifficultyColor = function(difficulty) {
+  switch (difficulty) {
+    case Quality.Poor :
+      return '#808080';
+    case Quality.Common :
+      return '#DDDDDD';
+    case Quality.Uncommon :
+      return '#00FF00';
+    case Quality.Rare :
+      return '#0000FF';
+    case Quality.Epic :
+      return '#CC00FF';
+  }
+}

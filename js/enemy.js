@@ -55,15 +55,12 @@ Enemy.prototype.generateRandomGear = function(level, averageQuality) {
 Enemy.prototype.dropLoot = function() {
 
   var multiplier = this.level * (this.difficulty + 1);
-  var gold =  multiplier + Math.round(multiplier * Math.random());
+  var money =  multiplier + Math.round(multiplier * Math.random());
 
   var xpPercentage = (this.difficulty + 2) * (40 + 10 * Math.random()) / (this.level + 4);
 
-  var numItemsToDrop = 0;
   var rand = Math.random();
-  if (this.difficulty == Quality.Poor) {
-    numItemsToDrop = rand < 0.7 ? 1 : 0;
-  }
+  var numItemsToDrop = (this.difficulty == Quality.Poor && rand < 0.3) ? 0 : 1;
 
   var loot = null;
   if (numItemsToDrop > 0) {
@@ -78,5 +75,5 @@ Enemy.prototype.dropLoot = function() {
     loot = availableGear[index];
   }
 
-  return [gold, xpPercentage, loot];
+  return [money, xpPercentage, loot];
 }
