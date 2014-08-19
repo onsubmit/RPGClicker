@@ -5,7 +5,7 @@ function Entity() {
   this.health = -1;
   this.maxHealth = 0;
   this.regen = 0.0;
-  this.difficulty = Quality.Uncommon;
+  this.difficulty = Quality.Common;
 	
   this.baseStrength = 3;
   this.baseAgility = 2;
@@ -111,10 +111,8 @@ Entity.prototype.attack = function(enemy, damageModifier) {
     status = 'Crit'
   }
 
-  var damageReductionPercentage = enemy.armor / (enemy.level * (enemy.difficulty + 1) * 64);
-  damageReductionPercentage = damageReductionPercentage * Math.max(1, 64 * (enemy.level - this.level));
-
-  damage = damage * (1 - damageReductionPercentage);
+  var damageReduction = (enemy.armor / this.level + 1) * (enemy.difficulty / Quality.Max + 1) / 8;
+  damage = damage / damageReduction;
 
   if (damageModifier) {
     damage *= damageModifier;

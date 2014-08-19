@@ -3,9 +3,9 @@ function Player() {
 
   this.regen = 150.0;
 
-  this.baseStrength = 2;
-  this.baseAgility = 5;
-  this.baseStamina = 5;
+  this.baseStrength = 10;
+  this.baseAgility = 8;
+  this.baseStamina = 9;
 
   this.baseDodgeChance    = 0.05;
   this.baseHitChance      = 0.9;
@@ -63,13 +63,13 @@ Player.prototype.getStamHealth = function() {
   return this.stamina <= jumpPoint ? this.stamina : jumpPoint + multiplier * (this.stamina - jumpPoint);
 }
 
-Player.prototype.equipItem = function(item) {
+Player.prototype.equipDrop = function(item) {
   if (!item) { return; }
 
   var itemMovedToInventory = false;
 
   if (this.gear[item.slot]) {
-    if (this.inventory.length < 25) {
+    if (!this.inventory.isFull()) {
       this.inventory.push(this.gear[item.slot]);
       itemMovedToInventory = true;
     }
@@ -85,11 +85,38 @@ Player.prototype.equipItem = function(item) {
   return itemMovedToInventory;
 }
 
-Player.prototype.equipItemFromInventory = function(invetoryIndex) {
-  var item = this.inventory[inventoryIndex];
+Player.prototype.equipItemFromInventory = function(item) {
   if (!item) { return; }
 
-  var temp = this.gear[item.slot];
-  this.gear[item.slot] = item;
-  this.inventory[inventoryIndex] = temp;
+  var removedGear = this.gear[item.slot];
+
+  if (removedGear) {
+    this.gear[item.slot] = item;
+    this.inventory[item.inventoryIndex] = removedGear;
+    removedGear.inventoryIndex = item.inventoryIndex;
+  }
+  else {
+    this.inventory.remove(item);
+  }
+
+  item.inventoryIndex = -1;
+
+  return removedGear;
+}
+
+Player.prototype.removeItemFromInventory = function(item) {
+  if (!item) { return; }
+  this.inventory.remove(item);
+}
+
+Player.prototype.unEquipItem = function(item) {
+  if (!item) { return; }
+  this.gear[item.slot] = null;
+}
+
+Player.prototype.sellItem = function(item) {
+  if (!item) { return; }
+
+  this.money += item.sellValue;
+  this.removeItemFromInventory(item);
 }

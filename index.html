@@ -51,7 +51,7 @@
             <td id="c11"><div></div></td>
           </tr>
         </table>
-        <div>
+        <div id="stats">
           <table class="stats">
             <tr>
               <td class="alignRight">Health:</td>
@@ -146,7 +146,9 @@
             <td id="i34"><div></div></td>
             <td id="i35"><div></div></td>
           </tr>
-          </table>
+        </table>
+        <div id="money"></div>
+        <div id="sell"><a href="#">Sell all</a></div>
       </div>
       <div class="healthContainer">
         <div id="playerCombatText" class="popupText"></div>
@@ -156,7 +158,6 @@
           </div>
         </div>
       </div>
-
       <div class="healthContainer">
         <div id="enemyCombatText" class="popupText"></div>
         <div id="enemyHealth" class="smallBar">
@@ -165,7 +166,6 @@
           </div>
         </div>
       </div>
-
       <div id="actions">
         <input id="attack" type="button" onclick="game.step();" value="Attack!" /><input id="run" type="button" onclick="game.runAway();" value="Run!" /><br />
         <div id="enemyLevelContainer" style="display: none;">

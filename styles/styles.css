@@ -5,6 +5,10 @@ body {
   margin: 0;
 }
 
+a {
+  color: white;
+}
+
 #container {
   margin-top: 30px;
   margin-left: 5px;
@@ -55,8 +59,8 @@ body {
 #inventory {
   float: right;
   width: 304px;
-  height: 304px;
   margin-right: 5px;
+  color: white;
   background-color: black;
 }
 
@@ -65,15 +69,34 @@ body {
   background-color: black;
 }
 
+#money {
+  text-align: right;
+  color: white;
+  background-color: #333;
+  padding: 5px;
+}
+
+#sell {
+  text-align: right;
+  color: white;
+  background-color: #333;
+  padding: 5px;
+}
+
+#stats {
+  background-color: #333;
+}
+
 .stats {
   font-size: 0.8125em;
   color: white;
+  padding: 5px;
 }
 
 .stats td {
   width: auto !important;
   height: auto !important;
-  background-color: black !important;
+  background-color: transparent !important;
 }
 
 .alignRight {
@@ -144,4 +167,8 @@ body {
   opacity: 0.9;
   z-index: 10;
   display: none;
+}
+
+.item .tooltip .stats {
+  padding: 0;
 }

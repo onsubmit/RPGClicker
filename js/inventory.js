@@ -26,16 +26,15 @@ Inventory.prototype.add = function(item) {
   }
 
   var index = this.firstOpenSlot;
+  item.inventoryIndex = index;
   this.items[index] = item;
   this.determineFirstOpenSlot();
   return index;
 }
 
-Inventory.prototype.remove = function(index) {
-  var item = null;
-  if (index < this.maxSize && this.items[index]) {
-    item = this.items[index];
-    this.items[index] = null;
+Inventory.prototype.remove = function(item) {
+  if (item.inventoryIndex < this.maxSize && this.items[item.inventoryIndex]) {
+    this.items[item.inventoryIndex] = null;
     this.determineFirstOpenSlot();
   }
 

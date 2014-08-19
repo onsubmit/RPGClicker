@@ -39,20 +39,20 @@ Attributes = {
 }
 
 function Equipment() {
-  this.name = '';
+  this.name      = '';
+  this.sellValue = 0;
 
   this.strength   = 0;
   this.agility    = 0;
   this.stamina    = 0;
-  this.armor    = 0;
+  this.armor      = 0;
 
   this.dodgeChance     = 0.0;
   this.hitChance       = 0.0;
   this.critChance      = 0.0;
   this.critMultiplier  = 0.0;
 
-  this.icon = null;
-  this.popup = null;
+  this.inventoryIndex = -1;
 }
 
 Equipment.getDropQuality = function(quality) {
@@ -102,6 +102,7 @@ Equipment.prototype.generateRandomItem = function(slot, level, quality) {
   this.quality = quality;
   
   var baseStat = level * (this.quality + 1);
+  this.sellValue = 20 * (baseStat + Math.round(level * Math.random()));
   var attributeTypes = Equipment.getAttributeTypes(slot, quality);
   
   for (var i = 0; i < attributeTypes.length; i++) {
@@ -136,6 +137,173 @@ Equipment.prototype.generateRandomItem = function(slot, level, quality) {
   }
   
   return this;
+}
+
+Equipment.prototype.getIcon = function() {
+  var borderColor = Entity.getDifficultyColor(this.quality);
+
+  var d = $('<div/>', {
+            class: 'item',
+            style: 'border: 2px solid ' + borderColor,
+            text: this.slot
+        });
+
+  var showToolip = function(item, e) {
+    var t = item.children('.tooltip');
+
+    var left = e.pageX + 10;
+    var top = e.pageY + 10;
+
+    if (left + t.width() > $(window).width()) {
+      left = e.pageX - t.width() - 10;
+    }
+
+    if (top + t.height() > $(window).height()) {
+      top = e.pageY - t.height() - 10;
+    }
+
+    t.show().css('left', left).css('top', top);
+  }
+
+  var hideToolip = function(item) {
+    var t = item.children('.tooltip');
+    t.hide();
+  }
+
+  d.append(this.getTooltip());
+  d.on('mousemove', function(e) { showToolip($(this), e); });
+  d.on('mouseout', function(e) { hideToolip($(this)); });
+
+  var item = this;
+  var rightClick = function() {
+    var g = window.game;
+    var itemInInventory = item.inventoryIndex >= 0;
+
+    if (itemInInventory) {
+      g.equipItemFromInventory(item);
+    }
+    else {
+      g.unEquipItem(item);
+    }
+  }
+
+  var shiftClick = function() {
+    var itemInInventory = item.inventoryIndex >= 0;
+
+    if (itemInInventory) {
+      var g = window.game;
+      var p = g.player;
+      p.sellItem(item);
+      g.removeItemFromInventory(item);
+    }
+  }
+
+  d.mousedown(function(e) {
+    switch (e.which) {
+        case 1: // left
+          if (e.shiftKey) {
+            shiftClick();
+          }
+          break;
+        case 2: // middle
+          break;
+        case 3: // right
+            rightClick();
+          break;
+        default:
+    }
+  });
+
+  return d;
+}
+
+Equipment.prototype.getTooltip = function() {
+  var itemInInventory = this.inventoryIndex >= 0;
+  var borderColor = Entity.getDifficultyColor(this.quality);
+
+  var t = $('<div/>', {
+            class: 'tooltip',
+            style: 'border: 2px solid ' + borderColor
+          }).append(
+            $('<div/>', {
+                style: 'color: ' + borderColor,
+                text: this.name
+            })
+          ).append(this.getTooltipStatsTable());
+
+  if (itemInInventory) {
+    t.append($('<div/>', {
+       text: 'Right-click to equip',
+      style: 'font-style: italic'
+    })).append($('<div/>', {
+       text: 'Shift-click to sell',
+      style: 'font-style: italic'
+    }));
+  }
+  else {
+    t.append($('<div/>', {
+      text: 'Right-click to unequip',
+      style: 'font-style: italic'
+    }));
+  }
+
+  return t;
+}
+
+Equipment.getStatsRow = function(label, value, style) {
+  var r = $('<tr/>').append(
+            $('<td/>', {
+              text: label + ':',
+              class: 'alignRight'
+            })
+          ).append(
+            $('<td/>', {
+              text: value,
+              style: style || ''
+            })
+          );
+
+  return r;
+}
+
+Equipment.prototype.getTooltipStatsTable = function(t) {
+    t = t || $('<table/>', {
+                class: 'stats'
+              });
+
+    if (this.stamina > 0) {
+      t.append(Equipment.getStatsRow('Stamina', this.stamina));
+    }
+
+    if (this.strength > 0) {
+      t.append(Equipment.getStatsRow('Strength', this.strength));
+    }
+
+    if (this.agility > 0) {
+      t.append(Equipment.getStatsRow('Agility', this.agility));
+    }
+
+    if (this.dodgeChance > 0) {
+      t.append(Equipment.getStatsRow('Dodge %', (100 * this.dodgeChance).toFixed(2)));
+    }
+
+    if (this.hitChance > 0) {
+      t.append(Equipment.getStatsRow('Hit %', (100 * this.hitChance).toFixed(2)));
+    }
+
+    if (this.critChance > 0) {
+      t.append(Equipment.getStatsRow('Crit %', (100 * this.critChance).toFixed(2)));
+    }
+
+    if (this.critMultiplier > 0) {
+      t.append(Equipment.getStatsRow('Crit Mult', this.critMultiplier.toFixed(2)));
+    }
+
+    if (this.sellValue > 0) {
+      t.append(Equipment.getStatsRow('Sells for', Equipment.getMoneyString(this.sellValue)));
+    }
+
+    return t;
 }
 
 Equipment.prototype.generateName = function(slot, level, quality) {
@@ -226,116 +394,16 @@ Equipment.prototype.generateName = function(slot, level, quality) {
   return prefix + " " + name + " of " + suffix;
 }
 
-Equipment.prototype.getIcon = function() {
-  if (!this.icon) {
+Equipment.getMoneyString = function(money) {
+  var copper = Math.floor(money % 100);
+  money = Math.floor((money - copper) / 100);
+  var silver = Math.floor(money % 100);
+  var gold = Math.floor((money - silver) / 100);
 
-    var borderColor = Entity.getDifficultyColor(this.quality);
+  var moneyString = '';
+  moneyString += gold > 0 ? gold + 'g ' : '';
+  moneyString += silver > 0 ? silver + 's ' : '';
+  moneyString += copper + 'c';
 
-    var d = $('<div/>', {
-              class: 'item',
-              style: 'border: 2px solid ' + borderColor,
-              text: this.slot
-          });
-
-    var showToolip = function(item, e) {
-      var t = item.children('.tooltip');
-
-      var left = e.pageX + 10;
-      var top = e.pageY + 10;
-
-      if (left + t.width() > $(window).width()) {
-        left = e.pageX - t.width() - 10;
-      }
-
-      if (top + t.height() > $(window).height()) {
-        top = e.pageY - t.height() - 10;
-      }
-
-      t.show().css('left', left).css('top', top);
-    }
-
-    var hideToolip = function(item) {
-      var t = item.children('.tooltip');
-      t.hide();
-    }
-
-    d.append(this.getTooltip());
-    d.on('mousemove', function(e) { showToolip($(this), e); });
-    d.on('mouseout', function(e) { hideToolip($(this)); });
-  }
-
-  this.icon = d;
-  return this.icon;
-}
-
-Equipment.prototype.getTooltip = function() {
-  if (!this.icon) {
-
-    var borderColor = Entity.getDifficultyColor(this.quality);
-
-    var d = $('<div/>', {
-              class: 'tooltip',
-              style: 'border: 2px solid ' + borderColor
-            }).append(
-              $('<div/>', {
-                  style: 'color: ' + borderColor,
-                  text: this.name
-              })
-            ).append(this.getTooltipStatsTable());
-  }
-
-  this.tooltip = d;
-  return this.tooltip;
-}
-
-Equipment.getStatsRow = function(label, value, style) {
-  var r = $('<tr/>').append(
-            $('<td/>', {
-              text: label + ':',
-              class: 'alignRight'
-            })
-          ).append(
-            $('<td/>', {
-              text: value,
-              style: style || ''
-            })
-          );
-
-  return r;
-}
-
-Equipment.prototype.getTooltipStatsTable = function(t) {
-    t = t || $('<table/>', {
-                class: 'stats'
-              });
-
-    if (this.stamina > 0) {
-      t.append(Equipment.getStatsRow('Stamina', this.stamina));
-    }
-
-    if (this.strength > 0) {
-      t.append(Equipment.getStatsRow('Strength', this.strength));
-    }
-
-    if (this.agility > 0) {
-      t.append(Equipment.getStatsRow('Agility', this.agility));
-    }
-
-    if (this.dodgeChance > 0) {
-      t.append(Equipment.getStatsRow('Dodge %', (100 * this.dodgeChance).toFixed(2)));
-    }
-
-    if (this.hitChance > 0) {
-      t.append(Equipment.getStatsRow('Hit %', (100 * this.hitChance).toFixed(2)));
-    }
-
-    if (this.critChance > 0) {
-      t.append(Equipment.getStatsRow('Crit %', (100 * this.critChance).toFixed(2)));
-    }
-
-    if (this.critMultiplier > 0) {
-      t.append(Equipment.getStatsRow('Crit Mult', this.critMultiplier.toFixed(2)));
-    }
-
-    return t;
+  return moneyString;
 }
