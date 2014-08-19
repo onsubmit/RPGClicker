@@ -154,11 +154,11 @@ Equipment.prototype.getIcon = function() {
     var left = e.pageX + 10;
     var top = e.pageY + 10;
 
-    if (left + t.width() > $(window).width()) {
+    if (left + t.width() > $(window).width() - 20) {
       left = e.pageX - t.width() - 10;
     }
 
-    if (top + t.height() > $(window).height()) {
+    if (top + t.height() > $(window).height() - 20) {
       top = e.pageY - t.height() - 10;
     }
 

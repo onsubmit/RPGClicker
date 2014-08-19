@@ -89,9 +89,9 @@ Player.prototype.equipItemFromInventory = function(item) {
   if (!item) { return; }
 
   var removedGear = this.gear[item.slot];
+  this.gear[item.slot] = item;
 
   if (removedGear) {
-    this.gear[item.slot] = item;
     this.inventory[item.inventoryIndex] = removedGear;
     removedGear.inventoryIndex = item.inventoryIndex;
   }
@@ -100,7 +100,7 @@ Player.prototype.equipItemFromInventory = function(item) {
   }
 
   item.inventoryIndex = -1;
-
+  this.getAttributesWithGear();
   return removedGear;
 }
 
@@ -112,6 +112,7 @@ Player.prototype.removeItemFromInventory = function(item) {
 Player.prototype.unEquipItem = function(item) {
   if (!item) { return; }
   this.gear[item.slot] = null;
+  this.getAttributesWithGear();
 }
 
 Player.prototype.sellItem = function(item) {
