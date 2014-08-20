@@ -30,9 +30,9 @@ Player.prototype.addXP = function(xpPercentage) {
 Player.prototype.levelUp = function() {
   Entity.prototype.levelUp.call(this);
   
-  this.baseStrength = this.baseStrength + this.level;
-  this.baseAgility = this.baseAgility + this.level;
-  this.baseStamina = this.baseStamina + this.level;
+  this.baseStrength = this.baseStrength + Math.floor(3 * Math.random()) + 1;
+  this.baseAgility = this.baseAgility + Math.floor(2 * Math.random()) + 1;
+  this.baseStamina = this.baseStamina + Math.floor(5 * Math.random()) + 1;
   
   this.getAttributesWithGear();
 
@@ -88,20 +88,20 @@ Player.prototype.equipDrop = function(item) {
 Player.prototype.equipItemFromInventory = function(item) {
   if (!item) { return; }
 
-  var removedGear = this.gear[item.slot];
-  this.gear[item.slot] = item;
+  var gearToReplace = this.gear[item.slot];
 
-  if (removedGear) {
-    this.inventory[item.inventoryIndex] = removedGear;
-    removedGear.inventoryIndex = item.inventoryIndex;
+  if (gearToReplace) {
+    this.inventory.replace(item, gearToReplace);
   }
   else {
     this.inventory.remove(item);
   }
 
   item.inventoryIndex = -1;
+  this.gear[item.slot] = item;
+
   this.getAttributesWithGear();
-  return removedGear;
+  return gearToReplace;
 }
 
 Player.prototype.removeItemFromInventory = function(item) {

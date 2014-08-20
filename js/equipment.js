@@ -125,13 +125,13 @@ Equipment.prototype.generateRandomItem = function(slot, level, quality) {
         this.dodgeChance = 0.005 + 0.025 * Math.random();
         break;
       case Attributes.HitChance:
-        this.hitChance = 0.02 * Math.random();
+        this.hitChance = this.quality / Quality.Max * 0.02 + 0.01 * Math.random();
         break;
       case Attributes.CritChance:
-        this.critChance = 0.02 * Math.random();
+        this.critChance = this.quality / Quality.Max * 0.02 + 0.01 * Math.random();
         break;
       case Attributes.CritMultiplier:
-        this.critMultiplier = 0.1 * Math.min(100, baseStat) * Math.random();
+        this.critMultiplier = this.quality / Quality.Max + Math.random();
         break;
     }
   }
@@ -139,17 +139,17 @@ Equipment.prototype.generateRandomItem = function(slot, level, quality) {
   return this;
 }
 
-Equipment.prototype.getIcon = function() {
-  var borderColor = Entity.getDifficultyColor(this.quality);
+Equipment.getIcon = function(item) {
+  var borderColor = Entity.getDifficultyColor(item.quality);
 
   var d = $('<div/>', {
             class: 'item',
             style: 'border: 2px solid ' + borderColor,
-            text: this.slot
+            text: item.slot
         });
 
-  var showToolip = function(item, e) {
-    var t = item.children('.tooltip');
+  var showToolip = function(icon, e) {
+    var t = icon.children('.tooltip');
 
     var left = e.pageX + 10;
     var top = e.pageY + 10;
@@ -165,16 +165,16 @@ Equipment.prototype.getIcon = function() {
     t.show().css('left', left).css('top', top);
   }
 
-  var hideToolip = function(item) {
-    var t = item.children('.tooltip');
+  var hideToolip = function(icon) {
+    var t = icon.children('.tooltip');
     t.hide();
   }
 
-  d.append(this.getTooltip());
+  d.append(Equipment.getTooltip(item));
+
   d.on('mousemove', function(e) { showToolip($(this), e); });
   d.on('mouseout', function(e) { hideToolip($(this)); });
 
-  var item = this;
   var rightClick = function() {
     var g = window.game;
     var itemInInventory = item.inventoryIndex >= 0;
@@ -217,9 +217,9 @@ Equipment.prototype.getIcon = function() {
   return d;
 }
 
-Equipment.prototype.getTooltip = function() {
-  var itemInInventory = this.inventoryIndex >= 0;
-  var borderColor = Entity.getDifficultyColor(this.quality);
+Equipment.getTooltip = function(item) {
+  var itemInInventory = item.inventoryIndex >= 0;
+  var borderColor = Entity.getDifficultyColor(item.quality);
 
   var t = $('<div/>', {
             class: 'tooltip',
@@ -227,9 +227,9 @@ Equipment.prototype.getTooltip = function() {
           }).append(
             $('<div/>', {
                 style: 'color: ' + borderColor,
-                text: this.name
+                text: item.name
             })
-          ).append(this.getTooltipStatsTable());
+          ).append(item.getTooltipStatsTable());
 
   if (itemInInventory) {
     t.append($('<div/>', {

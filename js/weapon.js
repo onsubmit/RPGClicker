@@ -12,7 +12,7 @@ Weapon.prototype.generateRandomItem = function(slot, level, quality) {
 }
 
 Weapon.prototype.getWeaponDamage = function() {
-  return this.minDamage + (Math.round(this.maxDamage  * Math.random() - this.minDamage));
+  return this.minDamage + Math.round((this.maxDamage - this.minDamage) * Math.random());
 }
 
 Weapon.prototype.generateName = function(slot, level, quality) {

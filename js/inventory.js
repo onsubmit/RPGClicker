@@ -40,3 +40,8 @@ Inventory.prototype.remove = function(item) {
 
   return item;
 }
+
+Inventory.prototype.replace = function(itemToReplace, replacement) {
+  this.items[itemToReplace.inventoryIndex] = replacement;
+  replacement.inventoryIndex = itemToReplace.inventoryIndex;
+}

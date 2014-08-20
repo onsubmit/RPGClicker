@@ -236,7 +236,7 @@ Game.prototype.addItemToInventory = function(item) {
 
 Game.prototype.displayItemInInventory = function(item) {
   var selector = '#i' + item.inventoryIndex + ' div';
-  var icon = item.getIcon();
+  var icon = Equipment.getIcon(item);
   $(selector).replaceWith(icon);
 }
 
@@ -258,7 +258,7 @@ Game.prototype.sellAllItemsFromInventory = function() {
 
 Game.prototype.displayItemOnCharacter = function(item) {
   var selector = '#c' + item.slot + ' div';
-  var icon = item.getIcon();
+  var icon = Equipment.getIcon(item);
   $(selector).replaceWith(icon);
 }
 
@@ -284,22 +284,59 @@ Game.prototype.unEquipItem = function(item) {
     return;
   }
 
-  this.player.unEquipItem(item);
-  this.removeItemFromCharacter(item);
+  var invSelector = '#i' + this.player.inventory.firstOpenSlot + ' div';
+  var chrSelector = '#c' + item.slot + ' div';
 
-  this.addItemToInventory(item);
+  var posInv = $(invSelector).position();
+  var posChr = $(chrSelector).position();
+
+  var g = this;
+  $(chrSelector + ' div.tooltip').remove();
+  $(chrSelector).css({ position: 'absolute', top: posChr.top, left: posChr.left }).animate({
+      top: posInv.top - $(chrSelector).height() / 2,
+      left: posInv.left,
+      opacity: '0'
+    }, 250).promise().done(
+    function(){
+      g.player.unEquipItem(item);
+      g.removeItemFromCharacter(item);
+      g.addItemToInventory(item);
+    });
 }
 
 Game.prototype.equipItemFromInventory = function(item) {
-  this.player.removeItemFromInventory(item);
-  this.removeItemFromInventory(item);
-  var itemReplacedFromGear = this.player.equipItemFromInventory(item);
+  var invSelector = '#i' + item.inventoryIndex + ' div';
+  var chrSelector = '#c' + item.slot + ' div';
 
-  this.displayItemOnCharacter(item);
+  var posInv = $(invSelector).position();
+  var posChr = $(chrSelector).position();
 
-  if (itemReplacedFromGear) {
-    this.displayItemInInventory(itemReplacedFromGear);
+  var g = this;
+  if (this.player.gear[item.slot]) {
+    $(chrSelector + ' div.tooltip').remove();
+
+    $(chrSelector).css({ position: 'absolute', top: posChr.top, left: posChr.left }).animate({
+        top: posInv.top - $(chrSelector).height() / 2,
+        left: posInv.left,
+        opacity: '0'
+      }, 250);
   }
+
+  $(invSelector + ' div.tooltip').remove();
+  $(invSelector).css({ position: 'absolute', top: posInv.top, left: posInv.left }).animate({
+      top: posChr.top - $(invSelector).height() / 2,
+      left: posChr.left,
+      opacity: '0'
+    }, 250).promise().done(
+    function(){
+      g.removeItemFromInventory(item);
+      var itemReplacedFromGear = g.player.equipItemFromInventory(item);
+      g.displayItemOnCharacter(item);
+
+      if (itemReplacedFromGear) {
+        g.displayItemInInventory(itemReplacedFromGear);
+      }
+    });
 }
 
 Game.prototype.makeEnemy = function() {

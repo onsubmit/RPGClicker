@@ -42,9 +42,12 @@ Entity.prototype.getAttributesWithGear = function() {
   this.agility = this.baseAgility;
   this.stamina = this.baseStamina;
   this.armor = 0;
-  this.dodgeChance = this.baseDodgeChance + this.agility * 0.001 + this.agility / (100 * this.level);
+
+  http://www.wolframalpha.com/input/?i=plot%5B0.7-0.69%2F%28x%2F50%2B1%29%2C+x%3D0+to+500%2C+y%3D0+to+1%5D
+  this.dodgeChance = this.baseDodgeChance + 0.7 - 0.69 / (1 + this.agility / 50);
   this.hitChance = this.baseHitChance;
-  this.critChance = this.baseCritChance + this.agility * 0.001 + this.agility / (100 * this.level);
+
+  this.critChance = this.baseCritChance + 0.4 - 0.39 / (1 + this.agility / 50);
   this.critMultiplier = this.baseCritMultiplier;
 
   for(var i = 0; i < this.gear.length; i++)
@@ -111,7 +114,7 @@ Entity.prototype.attack = function(enemy, damageModifier) {
     status = 'Crit'
   }
 
-  var damageReduction = (enemy.armor / this.level + 1) * (enemy.difficulty / Quality.Max + 1) / 8;
+  var damageReduction = (enemy.armor / this.level + 1) * (enemy.difficulty / 8 / Quality.Max + 1) / 4;
   damage = damage / damageReduction;
 
   if (damageModifier) {
