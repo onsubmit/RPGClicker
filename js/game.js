@@ -53,6 +53,16 @@ Game.prototype.updateUI = function() {
     $('#experienceBarText').text(g.getPlayerLevelText());
   }
 
+  var ilvl = 0;
+  for (var i = 0; i < Slot.Max; i++) {
+    var equipped = p.gear[i];
+    if (equipped) {
+      ilvl += equipped.ilvl;
+    }
+  }
+
+
+  $('#statsItemLevel').text(ilvl);
   $('#statsHealth').text(healthString);
   $('#statsStamina').text(p.stamina);
   $('#statsStrength').text(p.strength);

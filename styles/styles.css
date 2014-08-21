@@ -105,6 +105,12 @@ a {
   margin-bottom: 10px;
 }
 
+.tooltipHeader .slotName {
+  font-weight: normal;
+  font-size: 0.8125em;
+  color: white;
+}
+
 .tooltipStats {
   font-size: 0.9em;
   color: white;

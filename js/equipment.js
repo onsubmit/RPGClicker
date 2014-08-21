@@ -13,7 +13,8 @@ Slot = {
   Trinket2 : 11,
   MainHand : 12,
   OffHand : 13,
-  Max : 13
+  Max : 13,
+  Names : ['Head', 'Shoulders', 'Chest', 'Back', 'Wrist', 'Hands', 'Waist', 'Legs', 'Feet', 'Neck', 'Trinket1', 'Trinket2', 'Main-hand', 'Off-hand']
 }
 
 Quality = {
@@ -42,6 +43,7 @@ Attributes = {
 
 function Equipment() {
   this.name      = '';
+  this.ilvl      = 0;
   this.sellValue = 0;
 
   this.strength   = 0;
@@ -107,6 +109,7 @@ Equipment.prototype.generateRandomItem = function(slot, level, quality) {
   this.quality = quality;
   
   var baseStat = level * (this.quality + 1);
+  this.ilvl = baseStat;
   this.sellValue = 20 * (level * (4 * this.quality + 1) + Math.round(level * Math.random()));
   var attributeTypes = Equipment.getAttributeTypes(slot, quality);
   
@@ -156,7 +159,7 @@ Equipment.getIcon = function(item) {
   var d = $('<div/>', {
             class: 'item',
             style: 'border: 2px solid ' + borderColor,
-            text: item.slot
+            //text: item.slot
         });
 
   var showToolip = function(icon, e) {
@@ -243,8 +246,12 @@ Equipment.getTooltip = function(item) {
                 class: 'tooltipHeader',
                 style: 'color: ' + borderColor,
                 text: item.name
+            }).append(
+            $('<div/>', {
+                class: 'slotName',
+                text: Slot.Names[item.slot],
             })
-          ).append(itemInInventory ? item.getInventoryTooltipStatsTable(equipped) : item.getCharacterTooltipStatsTable());
+          )).append(itemInInventory ? item.getInventoryTooltipStatsTable(equipped) : item.getCharacterTooltipStatsTable());
 
   if (itemInInventory) {
     t.append($('<div/>', {
@@ -281,6 +288,10 @@ Equipment.prototype.getCharacterTooltipStatsTable = function(extraRow) {
   t = $('<table/>', {
         class: 'tooltipStats'
       });
+
+  if (this.ilvl > 0) {
+    t.append(this.getCharacterTooltipStatsRow('Item level', this.ilvl));
+  }
 
   if (extraRow) {
     t.append(extraRow);
@@ -366,6 +377,10 @@ Equipment.prototype.getInventoryTooltipStatsTable = function(equipped, extraRow)
           }));
 
   t.append(r);
+
+  if (this.ilvl > 0 || equipped.ilvl > 0) {
+    t.append(this.getInventoryTooltipStatsRow('Item level', this.ilvl, equipped.ilvl));
+  }
 
   if (extraRow) {
     t.append(extraRow);
