@@ -35,7 +35,9 @@ Attributes = {
   DodgeChance : 5,
   HitChance : 6,
   CritChance : 7,
-  CritMultiplier : 8
+  CritMultiplier : 8,
+  HP5 : 9,
+  HPKill : 10
 }
 
 function Equipment() {
@@ -51,6 +53,9 @@ function Equipment() {
   this.hitChance       = 0.0;
   this.critChance      = 0.0;
   this.critMultiplier  = 0.0;
+
+  this.hp5    = 0;
+  this.hpKill = 0;
 
   this.inventoryIndex = -1;
 }
@@ -72,7 +77,7 @@ Equipment.getDropQuality = function(quality) {
 }
 
 Equipment.getAttributeArray = function() {
-  return [ Attributes.Strength, Attributes.Agility, Attributes.Stamina, Attributes.ExtraArmor, Attributes.DodgeChance, Attributes.HitChance, Attributes.CritChance, Attributes.CritMultiplier ];
+  return [ Attributes.Strength, Attributes.Agility, Attributes.Stamina, Attributes.ExtraArmor, Attributes.DodgeChance, Attributes.HitChance, Attributes.CritChance, Attributes.CritMultiplier, Attributes.HP5, Attributes.HPKill ];
 }
 
 Equipment.getAttributeTypes = function(slot, quality) {
@@ -84,7 +89,7 @@ Equipment.getAttributeTypes = function(slot, quality) {
     var index = Math.floor(baseAttributes.length * Math.random());
 
     // Weapons can't have armor
-    if (slot === Slot.MainHand) {
+    if (slot === Slot.MainHand || slot === Slot.OffHand) {
       while(index == Attributes.ExtraArmor) {
         index = Math.floor(baseAttributes.length * Math.random());
       }
@@ -133,6 +138,12 @@ Equipment.prototype.generateRandomItem = function(slot, level, quality) {
       case Attributes.CritMultiplier:
         this.critMultiplier = this.quality / Quality.Max + Math.random();
         break;
+      case Attributes.HP5:
+        this.hp5 = baseStat + Math.round(level * Math.random());
+        break;
+      case Attributes.HPKill:
+        this.hpKill = baseStat + Math.round(5 * level * Math.random());
+        break;
     }
   }
   
@@ -170,10 +181,9 @@ Equipment.getIcon = function(item) {
     t.hide();
   }
 
-  d.append(Equipment.getTooltip(item));
-
-  d.on('mousemove', function(e) { showToolip($(this), e); });
-  d.on('mouseout', function(e) { hideToolip($(this)); });
+  d.mouseenter(function() { $(this).children('.tooltip').remove(); $(this).append(Equipment.getTooltip(item)); });
+  d.mousemove(function(e) { showToolip($(this), e); });
+  d.mouseout(function() { hideToolip($(this)); });
 
   var rightClick = function() {
     var g = window.game;
@@ -221,89 +231,217 @@ Equipment.getTooltip = function(item) {
   var itemInInventory = item.inventoryIndex >= 0;
   var borderColor = Entity.getDifficultyColor(item.quality);
 
+  if (itemInInventory) {
+    var equipped = window.game.player.gear[item.slot];
+  }
+
   var t = $('<div/>', {
             class: 'tooltip',
             style: 'border: 2px solid ' + borderColor
           }).append(
             $('<div/>', {
+                class: 'tooltipHeader',
                 style: 'color: ' + borderColor,
                 text: item.name
             })
-          ).append(item.getTooltipStatsTable());
+          ).append(itemInInventory ? item.getInventoryTooltipStatsTable(equipped) : item.getCharacterTooltipStatsTable());
 
   if (itemInInventory) {
     t.append($('<div/>', {
        text: 'Right-click to equip',
-      style: 'font-style: italic'
+      class: 'info'
     })).append($('<div/>', {
        text: 'Shift-click to sell',
-      style: 'font-style: italic'
+      class: 'info'
     }));
   }
   else {
     t.append($('<div/>', {
       text: 'Right-click to unequip',
-      style: 'font-style: italic'
+      class: 'info'
     }));
   }
 
   return t;
 }
 
-Equipment.getStatsRow = function(label, value, style) {
+Equipment.compare = function(var1, var2) {
+  if (var2 == null || var1 > var2) {
+    return 1;
+  }
+
+  if (var1 < var2) {
+    return -1
+  }
+
+  return 0;
+}
+
+Equipment.prototype.getCharacterTooltipStatsTable = function(extraRow) {
+  t = $('<table/>', {
+        class: 'tooltipStats'
+      });
+
+  if (extraRow) {
+    t.append(extraRow);
+  }
+
+  if (this.stamina > 0) {
+    t.append(this.getCharacterTooltipStatsRow('Stamina', this.stamina));
+  }
+
+  if (this.strength > 0) {
+    t.append(this.getCharacterTooltipStatsRow('Strength', this.strength));
+  }
+
+  if (this.agility > 0) {
+    t.append(this.getCharacterTooltipStatsRow('Agility', this.agility));
+  }
+
+  if (this.dodgeChance > 0) {
+    t.append(this.getCharacterTooltipStatsRow('Dodge %', (100 * this.dodgeChance).toFixed(2)));
+  }
+
+  if (this.hitChance > 0) {
+    t.append(this.getCharacterTooltipStatsRow('Hit %', (100 * this.hitChance).toFixed(2)));
+  }
+
+  if (this.critChance > 0) {
+    t.append(this.getCharacterTooltipStatsRow('Crit %', (100 * this.critChance).toFixed(2)));
+  }
+
+  if (this.critMultiplier > 0) {
+    t.append(this.getCharacterTooltipStatsRow('Crit Mult', this.critMultiplier.toFixed(2)));
+  }
+
+  if (this.hp5 > 0) {
+    t.append(this.getCharacterTooltipStatsRow('HP/5', this.hp5));
+  }
+
+  if (this.hpKill > 0) {
+    t.append(this.getCharacterTooltipStatsRow('HP/Kill', this.hpKill));
+  }
+
+  if (this.sellValue > 0) {
+    t.append(this.getCharacterTooltipStatsRow('Sell for', Equipment.getMoneyString(this.sellValue)));
+  }
+
+  return t;
+}
+
+Equipment.prototype.getCharacterTooltipStatsRow = function(label, val, style) {
+  style = style || '';
   var r = $('<tr/>').append(
             $('<td/>', {
               text: label + ':',
               class: 'alignRight'
-            })
-          ).append(
+            })).append(
             $('<td/>', {
-              text: value,
-              style: style || ''
+              text: val,
+              style: style 
             })
           );
 
   return r;
 }
 
-Equipment.prototype.getTooltipStatsTable = function(t) {
-    t = t || $('<table/>', {
-                class: 'stats'
-              });
+Equipment.prototype.getInventoryTooltipStatsTable = function(equipped, extraRow) {
+  if (!equipped) {
+    return this.getCharacterTooltipStatsTable();
+  }
 
-    if (this.stamina > 0) {
-      t.append(Equipment.getStatsRow('Stamina', this.stamina));
-    }
+  t = $('<table/>', {
+        class: 'tooltipStats'
+      });
 
-    if (this.strength > 0) {
-      t.append(Equipment.getStatsRow('Strength', this.strength));
-    }
+  var r = $('<tr/>').append(
+            $('<td/>')).append(
+            $('<td/>', {
+              style: 'border-right: 1px solid #333;'
+            })
+          ).append(
+            $('<td/>', {
+              text: 'Equipped',
+              style: 'color: ' + Entity.getDifficultyColor(equipped.quality)
+          }));
 
-    if (this.agility > 0) {
-      t.append(Equipment.getStatsRow('Agility', this.agility));
-    }
+  t.append(r);
 
-    if (this.dodgeChance > 0) {
-      t.append(Equipment.getStatsRow('Dodge %', (100 * this.dodgeChance).toFixed(2)));
-    }
+  if (extraRow) {
+    t.append(extraRow);
+  }
 
-    if (this.hitChance > 0) {
-      t.append(Equipment.getStatsRow('Hit %', (100 * this.hitChance).toFixed(2)));
-    }
+  if (this.stamina > 0 || equipped.stamina > 0) {
+    t.append(this.getInventoryTooltipStatsRow('Stamina', this.stamina, equipped.stamina));
+  }
 
-    if (this.critChance > 0) {
-      t.append(Equipment.getStatsRow('Crit %', (100 * this.critChance).toFixed(2)));
-    }
+  if (this.strength > 0 || equipped.strength > 0) {
+    t.append(this.getInventoryTooltipStatsRow('Strength', this.strength, equipped.strength));
+  }
 
-    if (this.critMultiplier > 0) {
-      t.append(Equipment.getStatsRow('Crit Mult', this.critMultiplier.toFixed(2)));
-    }
+  if (this.agility > 0 || equipped.agility > 0) {
+    t.append(this.getInventoryTooltipStatsRow('Agility', this.agility, equipped.agility));
+  }
 
-    if (this.sellValue > 0) {
-      t.append(Equipment.getStatsRow('Sells for', Equipment.getMoneyString(this.sellValue)));
-    }
+  if (this.dodgeChance > 0 || equipped.dodgeChance > 0) {
+    t.append(this.getInventoryTooltipStatsRow('Dodge %', (100 * this.dodgeChance).toFixed(2), (100 * equipped.dodgeChance).toFixed(2)));
+  }
 
-    return t;
+  if (this.hitChance > 0 || equipped.hitChance > 0) {
+    t.append(this.getInventoryTooltipStatsRow('Hit %', (100 * this.hitChance).toFixed(2), (100 * equipped.hitChance).toFixed(2)));
+  }
+
+  if (this.critChance > 0 || equipped.critChance > 0) {
+    t.append(this.getInventoryTooltipStatsRow('Crit %', (100 * this.critChance).toFixed(2), (100 * equipped.critChance).toFixed(2)));
+  }
+
+  if (this.critMultiplier > 0 || equipped.critMultiplier > 0) {
+    t.append(this.getInventoryTooltipStatsRow('Crit Mult', this.critMultiplier.toFixed(2), equipped.critMultiplier.toFixed(2)));
+  }
+
+  if (this.hp5 > 0 || equipped.hp5 > 0) {
+    t.append(this.getInventoryTooltipStatsRow('HP/5', this.hp5, equipped.hp5));
+  }
+
+  if (this.hpKill > 0 || equipped.hpKill > 0) {
+    t.append(this.getInventoryTooltipStatsRow('HP/Kill', this.hpKill, equipped.hpKill));
+  }
+
+  if (this.sellValue > 0 || equipped.sellValue > 0) {
+    var self = this;
+    t.append(this.getInventoryTooltipStatsRow('Sell for', Equipment.getMoneyString(this.sellValue), Equipment.getMoneyString(equipped.sellValue), function() { return Equipment.compare(self.sellValue, equipped.sellValue)}));
+  }
+
+  return t;
+}
+
+Equipment.prototype.getInventoryTooltipStatsRow = function(label, val1, val2, compare, style1, style2) {
+  var r = $('<tr/>').append(
+            $('<td/>', {
+              text: label + ':',
+              class: 'alignRight'
+            })
+          );
+
+  style1 = style1 || '';
+  style2 = style2 || '';
+
+  var c = compare ? compare() : Equipment.compare(val1, val2);
+  r = r.append(
+        $('<td/>', {
+          text: val1 == 0 ? '-' : val1,
+          style: 'border-right: 1px solid #333; color: ' + (c > 0 ? '#0F0' : (c < 0 ? '#F00' : '')) + '; ' + style1 
+        })
+      );
+
+  r = r.append(
+        $('<td/>', {
+          text: val2 == 0 ? '-' : val2,
+          style: style2
+        })
+      );
+
+  return r;
 }
 
 Equipment.prototype.generateName = function(slot, level, quality) {
@@ -403,7 +541,7 @@ Equipment.getMoneyString = function(money) {
   var moneyString = '';
   moneyString += gold > 0 ? gold + 'g ' : '';
   moneyString += silver > 0 ? silver + 's ' : '';
-  moneyString += copper + 'c';
+  moneyString += moneyString.length > 0 ? (copper > 0 ? copper + 'c' : '') : copper + 'c';
 
   return moneyString;
 }

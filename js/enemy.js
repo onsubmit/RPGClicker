@@ -36,7 +36,7 @@ Enemy.prototype.generateRandomGear = function(level, averageQuality) {
       var dropQuality = Equipment.getDropQuality(averageQuality);
 
       
-      if (slot === Slot.MainHand) {
+      if (slot === Slot.MainHand || slot === Slot.OffHand) {
         item = new Weapon();
         item = item.generateRandomItem(slot, level, dropQuality);
       }

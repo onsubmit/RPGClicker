@@ -16,11 +16,28 @@ Armor.prototype.generateName = function(slot, level, quality) {
   return Equipment.prototype.generateName.call(this, slot, level, quality);
 }
 
-Armor.prototype.getTooltipStatsTable = function(t) {
+Armor.prototype.getInventoryTooltipStatsTable = function(equipped) {
+  if (!equipped) {
+    return this.getCharacterTooltipStatsTable();
+  }
+
+  var extraRow = null;
+  if (this.armor > 0 || equipped.armor > 0) {
+    extraRow = Equipment.prototype.getInventoryTooltipStatsRow.call(this, 'Armor', this.armor, equipped.armor, null, this.hasExtraArmor ? 'font-weight: bold' : '', equipped.hasExtraArmor ? 'font-weight: bold' : '');
+  }
+
+  return Equipment.prototype.getInventoryTooltipStatsTable.call(this, equipped, extraRow);
+}
+
+Armor.prototype.getCharacterTooltipStatsTable = function(){
   var t = $('<table/>', {
               class: 'stats'
             });
 
-  t.append(Equipment.getStatsRow('Armor', this.armor, this.hasExtraArmor ? 'font-weight: bold; color: #0f0' : ''));
-  return Equipment.prototype.getTooltipStatsTable.call(this, t);
+  var extraRow = null;
+  if (this.armor > 0) {
+    extraRow = Equipment.prototype.getCharacterTooltipStatsRow.call(this, 'Armor', this.armor, this.hasExtraArmor ? 'font-weight: bold' : '');
+  }
+
+  return Equipment.prototype.getCharacterTooltipStatsTable.call(this, extraRow);
 }

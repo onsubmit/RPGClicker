@@ -19,11 +19,26 @@ Weapon.prototype.generateName = function(slot, level, quality) {
   return Equipment.prototype.generateName.call(this, slot, level, quality);
 }
 
-Weapon.prototype.getTooltipStatsTable = function(t) {
+Weapon.prototype.getInventoryTooltipStatsTable = function(equipped) {
+  if (!equipped) {
+    return this.getCharacterTooltipStatsTable();
+  }
+
+  var self = this;
+  var extraRow = Equipment.prototype.getInventoryTooltipStatsRow.call(this, 'Damage', this.getDamageString(), equipped.getDamageString(), function() { return Equipment.compare(self.maxDamage, equipped.maxDamage)});
+
+  return Equipment.prototype.getInventoryTooltipStatsTable.call(this, equipped, extraRow);
+}
+
+Weapon.prototype.getCharacterTooltipStatsTable = function() {
   var t = $('<table/>', {
               class: 'stats'
             });
 
-  t.append(Equipment.getStatsRow('Damage', this.minDamage + ' - ' + this.maxDamage));
-  return Equipment.prototype.getTooltipStatsTable.call(this, t);
+  var extraRow = Equipment.prototype.getCharacterTooltipStatsRow.call(this, 'Damage', this.getDamageString());
+  return Equipment.prototype.getCharacterTooltipStatsTable.call(this, extraRow);
+}
+
+Weapon.prototype.getDamageString = function() {
+  return this.minDamage + '\u2013' + this.maxDamage;
 }

@@ -4,7 +4,8 @@ function Entity() {
   this.level = 1;
   this.health = -1;
   this.maxHealth = 0;
-  this.regen = 0.0;
+  this.baseHP5 = 0.0;
+  this.baseHPKill = 0;
   this.difficulty = Quality.Common;
 	
   this.baseStrength = 3;
@@ -43,12 +44,14 @@ Entity.prototype.getAttributesWithGear = function() {
   this.stamina = this.baseStamina;
   this.armor = 0;
 
-  http://www.wolframalpha.com/input/?i=plot%5B0.7-0.69%2F%28x%2F50%2B1%29%2C+x%3D0+to+500%2C+y%3D0+to+1%5D
-  this.dodgeChance = this.baseDodgeChance + 0.7 - 0.69 / (1 + this.agility / 50);
+  this.dodgeChance = this.baseDodgeChance;
   this.hitChance = this.baseHitChance;
 
-  this.critChance = this.baseCritChance + 0.4 - 0.39 / (1 + this.agility / 50);
+  this.critChance = this.baseCritChance;
   this.critMultiplier = this.baseCritMultiplier;
+
+  this.hp5 = this.baseHP5;
+  this.hpKill = this.baseHPKill;
 
   for(var i = 0; i < this.gear.length; i++)
   {
@@ -62,10 +65,16 @@ Entity.prototype.getAttributesWithGear = function() {
       this.hitChance = this.hitChance + item.hitChance;
       this.critChance = this.critChance + item.critChance;
       this.critMultiplier = this.critMultiplier + item.critMultiplier;
+      this.hp5 = this.hp5 + item.hp5;
+      this.hpKill = this.hpKill + item.hpKill;
     }
   }
 
   this.maxHealth = this.getMaxHealth();
+
+  http://www.wolframalpha.com/input/?i=plot%5B0.7-0.69%2F%28x%2F50%2B1%29%2C+x%3D0+to+500%2C+y%3D0+to+1%5D
+  this.dodgeChance = this.dodgeChance + 0.7 - 0.69 / (1 + this.agility / 50);
+  this.critChance = this.critChance + 0.4 - 0.39 / (1 + this.agility / 50);
 
   if (this.health < 0) {
     this.health = this.maxHealth;
@@ -114,7 +123,7 @@ Entity.prototype.attack = function(enemy, damageModifier) {
     status = 'Crit'
   }
 
-  var damageReduction = (enemy.armor / this.level + 1) * (enemy.difficulty / 8 / Quality.Max + 1) / 4;
+  var damageReduction = (enemy.armor / this.level + 1) * (enemy.difficulty / 16 / Quality.Max + 1) / 4;
   damage = damage / damageReduction;
 
   if (damageModifier) {

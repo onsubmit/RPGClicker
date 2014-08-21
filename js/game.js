@@ -1,6 +1,6 @@
 function Game()
 {
-  this.enemyDamageModifier = 0.1;
+  this.enemyDamageModifier = 0.4;
 
   this.player = new Player();
   this.enemyLevel = this.player.level;
@@ -53,7 +53,6 @@ Game.prototype.updateUI = function() {
   }
 
   $('#statsHealth').text(healthString);
-  $('#statsMP5').text(p.regen);
   $('#statsStamina').text(p.stamina);
   $('#statsStrength').text(p.strength);
   $('#statsAgility').text(p.agility);
@@ -62,6 +61,8 @@ Game.prototype.updateUI = function() {
   $('#statsDodge').text((100 * p.dodgeChance).toFixed(2));
   $('#statsCrit').text((100 * p.critChance).toFixed(2));
   $('#statsCritMult').text(p.critMultiplier.toFixed(2));
+  $('#statsHP5').text(p.hp5);
+  $('#statsHPKill').text(p.hpKill);
 
   $('#money').text(Equipment.getMoneyString(p.money))
 }
@@ -138,6 +139,7 @@ Game.prototype.attackEnemy = function() {
 
   if (this.enemy.isDead()) {
       this.lootEnemy();
+      this.player.heal(this.player.hpKill);
       this.enemy = this.makeEnemy();
       this.updateUI();
   }
@@ -174,6 +176,7 @@ Game.prototype.attackPlayer = function() {
 
     if (this.enemy.isDead()) {
         this.lootEnemy();
+        this.player.heal(this.player.hpKill);
         this.enemy = this.makeEnemy();
         this.updateUI();
     }

@@ -1,5 +1,5 @@
 body {
-  font-family: "segoe ui", "lucida grande", tahoma, verdana, arial, helvetica, sans-serif;
+  font-family: arial, helvetica, sans-serif;
   font-size: 0.8125em;
   line-height: 1.3em;
   margin: 0;
@@ -96,8 +96,31 @@ a {
 .stats td {
   width: auto !important;
   height: auto !important;
-  background-color: transparent !important;
+  padding: 2px;
 }
+
+.tooltipHeader {
+  font-weight: bold;
+  font-size: 1.0em;
+  margin-bottom: 10px;
+}
+
+.tooltipStats {
+  font-size: 0.9em;
+  color: white;
+  border: 0;
+  margin-bottom: 10px;
+  border-spacing: 0px;
+}
+
+.tooltipStats td {
+  width: auto !important;
+  height: auto !important;
+  background: #002 !important;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
 
 .alignRight {
   text-align: right;
@@ -163,12 +186,13 @@ a {
   white-space: nowrap;
   padding: 5px;
   color: #ddd;
-  background: black;
+  background: #002;
   opacity: 0.9;
   z-index: 10;
   display: none;
 }
 
-.item .tooltip .stats {
-  padding: 0;
+.item .tooltip .info {
+  font-size: 0.8em;
+  color: #666;
 }
