@@ -90,11 +90,11 @@
               <td id="statsCritMult"></td>
             </tr>
             <tr>
-              <td class="alignRight">HP/5:</td>
+              <td class="alignRight">HP/5 %:</td>
               <td id="statsHP5"></td>
             </tr>
             <tr>
-              <td class="alignRight">HP/Kill:</td>
+              <td class="alignRight">HP/Kill %:</td>
               <td id="statsHPKill"></td>
             </tr>
           </table>
@@ -172,6 +172,7 @@
       </div>
       <div id="actions">
         <input id="attack" type="button" onclick="game.step();" value="Attack!" /><input id="run" type="button" onclick="game.runAway();" value="Run!" /><br />
+        <input id="autoAttack" type="checkbox" /><label for="autoAttack">Auto attack until health &lt; 25%</label>
         <div id="enemyLevelContainer" style="display: none;">
           <label for="enemyLevel">Next enemy level:</label>
           <span id="enemyLevelDropdownContainer"><select id="enemyLevel"></select></span>

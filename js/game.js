@@ -8,6 +8,7 @@ function Game()
   this.enemyHealthShown = false;
   this.experienceShown = false;
   this.experienceAnimationNeeded = false;
+  this.autoAttackTimerId = -1;
   setInterval(this.updateUI, 50);
 }
 
@@ -42,7 +43,7 @@ Game.prototype.updateUI = function() {
 
   if (this.experienceAnimationNeeded) {
     this.experienceAnimationNeeded = false;
-    $('#experienceBar').animate({ width: xpWidthPercentage + '%' }, 500);
+    $('#experienceBar').animate({ width: xpWidthPercentage + '%' }, 50);
   }
 
   if (g.experienceShown) {
@@ -61,8 +62,8 @@ Game.prototype.updateUI = function() {
   $('#statsDodge').text((100 * p.dodgeChance).toFixed(2));
   $('#statsCrit').text((100 * p.critChance).toFixed(2));
   $('#statsCritMult').text(p.critMultiplier.toFixed(2));
-  $('#statsHP5').text(p.hp5);
-  $('#statsHPKill').text(p.hpKill);
+  $('#statsHP5').text((100 * p.hp5Pct).toFixed(2));
+  $('#statsHPKill').text((100 * p.hpKillPct).toFixed(2) + ' (' + Math.round(p.hpKillPct * p.maxHealth) + ')');
 
   $('#money').text(Equipment.getMoneyString(p.money))
 }
@@ -139,7 +140,7 @@ Game.prototype.attackEnemy = function() {
 
   if (this.enemy.isDead()) {
       this.lootEnemy();
-      this.player.heal(this.player.hpKill);
+      this.player.heal(this.player.hpKillPct * this.player.maxHealth);
       this.enemy = this.makeEnemy();
       this.updateUI();
   }
@@ -176,7 +177,7 @@ Game.prototype.attackPlayer = function() {
 
     if (this.enemy.isDead()) {
         this.lootEnemy();
-        this.player.heal(this.player.hpKill);
+        this.player.heal(this.player.hpKillPct * this.player.maxHealth);
         this.enemy = this.makeEnemy();
         this.updateUI();
     }
@@ -400,6 +401,24 @@ $(document).ready(function() {
     );
 
     $('#sell').click(function() { game.sellAllItemsFromInventory() });
+    $('#autoAttack').change(function() {
+      var self = $(this);
+      var isChecked = self.is(':checked');
+
+      if(isChecked) {
+        game.autoAttackTimerId = setInterval(function() {
+          if (game.player.health / game.player.maxHealth < 0.25 && game.autoAttackTimerId >= 0) {
+            self.prop('checked', false);
+            clearInterval(game.autoAttackTimerId);
+            return;
+          }
+
+          game.step.call(game);
+        }, 50);
+      } else {
+        clearInterval(game.autoAttackTimerId);
+      }
+    });
 
     $('body')
       .bind("contextmenu", function(e) { return false; })

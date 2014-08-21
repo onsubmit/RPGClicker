@@ -36,8 +36,8 @@ Attributes = {
   HitChance : 6,
   CritChance : 7,
   CritMultiplier : 8,
-  HP5 : 9,
-  HPKill : 10
+  HP5Pct : 9,
+  HPKillPct : 10
 }
 
 function Equipment() {
@@ -54,8 +54,8 @@ function Equipment() {
   this.critChance      = 0.0;
   this.critMultiplier  = 0.0;
 
-  this.hp5    = 0;
-  this.hpKill = 0;
+  this.hp5Pct    = 0;
+  this.hpKillPct = 0;
 
   this.inventoryIndex = -1;
 }
@@ -77,7 +77,7 @@ Equipment.getDropQuality = function(quality) {
 }
 
 Equipment.getAttributeArray = function() {
-  return [ Attributes.Strength, Attributes.Agility, Attributes.Stamina, Attributes.ExtraArmor, Attributes.DodgeChance, Attributes.HitChance, Attributes.CritChance, Attributes.CritMultiplier, Attributes.HP5, Attributes.HPKill ];
+  return [ Attributes.Strength, Attributes.Agility, Attributes.Stamina, Attributes.ExtraArmor, Attributes.DodgeChance, Attributes.HitChance, Attributes.CritChance, Attributes.CritMultiplier, Attributes.HP5Pct, Attributes.HPKillPct ];
 }
 
 Equipment.getAttributeTypes = function(slot, quality) {
@@ -107,7 +107,7 @@ Equipment.prototype.generateRandomItem = function(slot, level, quality) {
   this.quality = quality;
   
   var baseStat = level * (this.quality + 1);
-  this.sellValue = 20 * (baseStat + Math.round(level * Math.random()));
+  this.sellValue = 20 * (level * (4 * this.quality + 1) + Math.round(level * Math.random()));
   var attributeTypes = Equipment.getAttributeTypes(slot, quality);
   
   for (var i = 0; i < attributeTypes.length; i++) {
@@ -138,11 +138,11 @@ Equipment.prototype.generateRandomItem = function(slot, level, quality) {
       case Attributes.CritMultiplier:
         this.critMultiplier = this.quality / Quality.Max + Math.random();
         break;
-      case Attributes.HP5:
-        this.hp5 = baseStat + Math.round(level * Math.random());
+      case Attributes.HP5Pct:
+        this.hp5Pct = this.quality / Quality.Max * 0.04 + 0.02 * Math.random();
         break;
-      case Attributes.HPKill:
-        this.hpKill = baseStat + Math.round(5 * level * Math.random());
+      case Attributes.HPKillPct:
+        this.hpKillPct = this.quality / Quality.Max * 0.01 + 0.005 * Math.random();
         break;
     }
   }
@@ -314,12 +314,12 @@ Equipment.prototype.getCharacterTooltipStatsTable = function(extraRow) {
     t.append(this.getCharacterTooltipStatsRow('Crit Mult', this.critMultiplier.toFixed(2)));
   }
 
-  if (this.hp5 > 0) {
-    t.append(this.getCharacterTooltipStatsRow('HP/5', this.hp5));
+  if (this.hp5Pct > 0) {
+    t.append(this.getCharacterTooltipStatsRow('HP/5 %', (100 * this.hp5Pct).toFixed(2)));
   }
 
-  if (this.hpKill > 0) {
-    t.append(this.getCharacterTooltipStatsRow('HP/Kill', this.hpKill));
+  if (this.hpKillPct > 0) {
+    t.append(this.getCharacterTooltipStatsRow('HP/Kill %', (100 * this.hpKillPct).toFixed(2)));
   }
 
   if (this.sellValue > 0) {
@@ -399,12 +399,12 @@ Equipment.prototype.getInventoryTooltipStatsTable = function(equipped, extraRow)
     t.append(this.getInventoryTooltipStatsRow('Crit Mult', this.critMultiplier.toFixed(2), equipped.critMultiplier.toFixed(2)));
   }
 
-  if (this.hp5 > 0 || equipped.hp5 > 0) {
-    t.append(this.getInventoryTooltipStatsRow('HP/5', this.hp5, equipped.hp5));
+  if (this.hp5Pct > 0 || equipped.hp5Pct > 0) {
+    t.append(this.getInventoryTooltipStatsRow('HP/5 %', (100 * this.hp5Pct).toFixed(2), (100 * equipped.hp5Pct).toFixed(2)));
   }
 
-  if (this.hpKill > 0 || equipped.hpKill > 0) {
-    t.append(this.getInventoryTooltipStatsRow('HP/Kill', this.hpKill, equipped.hpKill));
+  if (this.hpKillPct > 0 || equipped.hpKillPct > 0) {
+    t.append(this.getInventoryTooltipStatsRow('HP/Kill %', (100 * this.hpKillPct).toFixed(2), (100 * equipped.hpKillPct).toFixed(2)));
   }
 
   if (this.sellValue > 0 || equipped.sellValue > 0) {

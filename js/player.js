@@ -1,8 +1,8 @@
 function Player() {
   this.inventory = new Inventory();
 
-  this.baseHP5 = 150.0;
-  this.baseHPKill = 0;
+  this.baseHP5Pct = 0.5;
+  this.baseHPKillPct = 0;
 
   this.baseStrength = 80;
   this.baseAgility = 50;
@@ -43,7 +43,7 @@ Player.prototype.levelUp = function() {
 }
 
 Player.prototype.regenHealth = function(intervalInMilliseconds) {
-  Player.prototype.heal.call(this, this.hp5 / (5000 / intervalInMilliseconds));
+  Player.prototype.heal.call(this, (this.hp5Pct * this.maxHealth) / (5000 / intervalInMilliseconds));
 }
 
 Player.prototype.getBaseHealth = function() {

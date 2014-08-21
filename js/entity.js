@@ -4,8 +4,8 @@ function Entity() {
   this.level = 1;
   this.health = -1;
   this.maxHealth = 0;
-  this.baseHP5 = 0.0;
-  this.baseHPKill = 0;
+  this.baseHP5Pct = 0.0;
+  this.baseHPKillPct = 0;
   this.difficulty = Quality.Common;
 	
   this.baseStrength = 3;
@@ -50,8 +50,8 @@ Entity.prototype.getAttributesWithGear = function() {
   this.critChance = this.baseCritChance;
   this.critMultiplier = this.baseCritMultiplier;
 
-  this.hp5 = this.baseHP5;
-  this.hpKill = this.baseHPKill;
+  this.hp5Pct = this.baseHP5Pct;
+  this.hpKillPct = this.baseHPKillPct;
 
   for(var i = 0; i < this.gear.length; i++)
   {
@@ -65,16 +65,16 @@ Entity.prototype.getAttributesWithGear = function() {
       this.hitChance = this.hitChance + item.hitChance;
       this.critChance = this.critChance + item.critChance;
       this.critMultiplier = this.critMultiplier + item.critMultiplier;
-      this.hp5 = this.hp5 + item.hp5;
-      this.hpKill = this.hpKill + item.hpKill;
+      this.hp5Pct = this.hp5Pct + item.hp5Pct;
+      this.hpKillPct = this.hpKillPct + item.hpKillPct;
     }
   }
 
   this.maxHealth = this.getMaxHealth();
 
   http://www.wolframalpha.com/input/?i=plot%5B0.7-0.69%2F%28x%2F50%2B1%29%2C+x%3D0+to+500%2C+y%3D0+to+1%5D
-  this.dodgeChance = this.dodgeChance + 0.7 - 0.69 / (1 + this.agility / 50);
-  this.critChance = this.critChance + 0.4 - 0.39 / (1 + this.agility / 50);
+  this.dodgeChance = this.dodgeChance + 0.7 - 0.69 / (1 + this.agility / 500);
+  this.critChance = this.critChance + 0.4 - 0.39 / (1 + this.agility / 500);
 
   if (this.health < 0) {
     this.health = this.maxHealth;
@@ -161,10 +161,14 @@ Entity.getDifficultyColor = function(difficulty) {
     case Quality.Common :
       return '#DDDDDD';
     case Quality.Uncommon :
-      return '#00FF00';
+      return '#1EFF00';
     case Quality.Rare :
-      return '#0000FF';
+      return '#0070DD';
     case Quality.Epic :
-      return '#CC00FF';
+      return '#A335EE';
+    case Quality.Legendary :
+      return '#FF8000';
+    case Quality.Artifact :
+      return '#E5CC80';
   }
 }
