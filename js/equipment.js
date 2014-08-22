@@ -45,6 +45,7 @@ function Equipment() {
   this.name      = '';
   this.ilvl      = 0;
   this.sellValue = 0;
+  this.quality   = 0
 
   this.strength   = 0;
   this.agility    = 0;
@@ -130,7 +131,9 @@ Equipment.prototype.generateRandomItem = function(slot, level, quality) {
         this.armor += baseStat + Math.round(level * Math.random());
         break;
       case Attributes.DodgeChance:
-        this.dodgeChance = 0.005 + 0.025 * Math.random();
+        //this.dodgeChance = 0.005 + 0.025 * Math.random();
+        // http://www.wolframalpha.com/input/?i=plot3d+100+*+%280.01+-+0.009%2F%28%28x*%28y+%2B+1%29%29%2F500%2B1%29%29%2C+x%3D0+to+100%2C+y%3D0+to+8
+        this.dodgeChance = 0.01 - 0.009 / (1 + baseStat / 500);
         break;
       case Attributes.HitChance:
         this.hitChance = this.quality / Quality.Max * 0.02 + 0.01 * Math.random();
@@ -158,7 +161,7 @@ Equipment.getIcon = function(item) {
 
   var d = $('<div/>', {
             class: 'item',
-            style: 'border: 2px solid ' + borderColor,
+            style: 'background-image: ' + 'url(\'images/slot' + item.slot + '.png\'); border: 2px solid ' + borderColor
             //text: item.slot
         });
 
@@ -444,14 +447,14 @@ Equipment.prototype.getInventoryTooltipStatsRow = function(label, val1, val2, co
   var c = compare ? compare() : Equipment.compare(val1, val2);
   r = r.append(
         $('<td/>', {
-          text: val1 == 0 ? '-' : val1,
+          text: val1 == 0 ? '\u2013' : val1,
           style: 'border-right: 1px solid #333; color: ' + (c > 0 ? '#0F0' : (c < 0 ? '#F00' : '')) + '; ' + style1 
         })
       );
 
   r = r.append(
         $('<td/>', {
-          text: val2 == 0 ? '-' : val2,
+          text: val2 == 0 ? '\u2013' : val2,
           style: style2
         })
       );

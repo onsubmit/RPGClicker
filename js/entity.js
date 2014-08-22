@@ -72,8 +72,8 @@ Entity.prototype.getAttributesWithGear = function() {
 
   this.maxHealth = this.getMaxHealth();
 
-  http://www.wolframalpha.com/input/?i=plot%5B0.7-0.69%2F%28x%2F50%2B1%29%2C+x%3D0+to+500%2C+y%3D0+to+1%5D
-  this.dodgeChance = this.dodgeChance + 0.7 - 0.69 / (1 + this.agility / 500);
+  http://www.wolframalpha.com/input/?i=plot%5B0.5-0.49%2F%28x%2F50%2B1%29%2C+x%3D0+to+500%2C+y%3D0+to+1%5D
+  this.dodgeChance = this.dodgeChance + 0.5 - 0.49 / (1 + this.agility / 500);
   this.critChance = this.critChance + 0.4 - 0.39 / (1 + this.agility / 500);
 
   if (this.health < 0) {

@@ -9,7 +9,22 @@ function Game()
   this.experienceShown = false;
   this.experienceAnimationNeeded = false;
   this.autoAttackTimerId = -1;
+  this.autoSellQualities = [];
   setInterval(this.updateUI, 50);
+  setInterval(this.autoSell, 1000);
+}
+
+Game.prototype.autoSell = function() {
+  var g = window.game;
+  var p = g.player;
+  var q = g.autoSellQualities;
+  for (var i = 0; i < p.inventory.items.length; i++) {
+    var item = p.inventory.items[i];
+    if (item && q[item.quality]) {
+      g.removeItemFromInventory(item);
+      p.sellItem(item);
+    }
+  }
 }
 
 Game.prototype.updateUI = function() {
@@ -234,8 +249,13 @@ Game.prototype.lootEnemy = function() {
     }
     else if (!this.player.inventory.isFull()) {
       this.addItemToInventory(loot);
+      $('#autoSell' + loot.quality).show();
     }
     else {
+      if ($('#autoAttack').is(':checked') && game.autoAttackTimerId >= 0)
+      $('#autoAttack').prop('checked', false);
+      clearInterval(game.autoAttackTimerId);
+      game.autoAttackTimerId = -1;
       alert('Inventory full. Can\'t loot item.');
     }
   }
@@ -256,7 +276,8 @@ Game.prototype.displayItemInInventory = function(item) {
 
 Game.prototype.removeItemFromInventory = function(item) {
   var selector = '#i' + item.inventoryIndex + ' div';
-  $(selector).replaceWith($('<div/>'));
+  var self = $(selector);
+  self.fadeOut("fast", function() { self.replaceWith($('<div/>')) });
 }
 
 Game.prototype.sellAllItemsFromInventory = function() {
@@ -410,7 +431,24 @@ $(document).ready(function() {
       }
     );
 
+    var changeCheck = function() {
+      var data = $(this).val();
+      var quality = data[0];
+      var checked = data[1] == "true";
+      $(this).text(checked ? '\u2610' : '\u2611');
+      $(this).val([quality, !checked]);
+      game.autoSellQualities[quality] = !checked;
+    }
+
     $('#sell').click(function() { game.sellAllItemsFromInventory() });
+    $('#autoSell0').css('color', Entity.getDifficultyColor(Quality.Poor)).val([Quality.Poor, false]).click(changeCheck);
+    $('#autoSell1').css('color', Entity.getDifficultyColor(Quality.Common)).val([Quality.Common, false]).click(changeCheck).hide();
+    $('#autoSell2').css('color', Entity.getDifficultyColor(Quality.Uncommon)).val([Quality.Uncommon, false]).click(changeCheck).hide();
+    $('#autoSell3').css('color', Entity.getDifficultyColor(Quality.Rare)).val([Quality.Rare, false]).click(changeCheck).hide();
+    $('#autoSell4').css('color', Entity.getDifficultyColor(Quality.Epic)).val([Quality.Epic, false]).click(changeCheck).hide();
+    $('#autoSell5').css('color', Entity.getDifficultyColor(Quality.Legendary)).val([Quality.Legendary, false]).click(changeCheck).hide();
+    $('#autoSell6').css('color', Entity.getDifficultyColor(Quality.Artifact)).val([Quality.Artifact, false]).click(changeCheck).hide();
+
     $('#autoAttack').change(function() {
       var self = $(this);
       var isChecked = self.is(':checked');
@@ -420,6 +458,7 @@ $(document).ready(function() {
           if (game.player.health / game.player.maxHealth < 0.25 && game.autoAttackTimerId >= 0) {
             self.prop('checked', false);
             clearInterval(game.autoAttackTimerId);
+            game.autoAttackTimerId = -1;
             return;
           }
 
@@ -429,6 +468,7 @@ $(document).ready(function() {
         clearInterval(game.autoAttackTimerId);
       }
     });
+
 
     $('body')
       .bind("contextmenu", function(e) { return false; })
