@@ -39,7 +39,7 @@ Player.prototype.levelUp = function() {
 
   this.health = this.getMaxHealth();
   this.xp = this.xp - this.xpMax;
-  this.xpMax = Math.round(this.xpMax * (1.8 + (this.level / 100)));
+  this.xpMax = Math.round(this.xpMax * 1.4);
 }
 
 Player.prototype.regenHealth = function(intervalInMilliseconds) {

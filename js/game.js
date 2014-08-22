@@ -1,6 +1,6 @@
 function Game()
 {
-  this.enemyDamageModifier = 0.4;
+  this.enemyDamageModifier = 0.6;
 
   this.player = new Player();
   this.enemyLevel = this.player.level;
@@ -220,26 +220,11 @@ Game.prototype.lootEnemy = function() {
 
   var oldLevel = this.player.level;
   var xpPercentage = drops[1];
-
-  var penalties = [1, 0.4, 0.1];
-  var lvlDifference = this.player.level - this.enemy.level;
-  xpPercentage *= (lvlDifference > 2 ? 0 : penalties[lvlDifference]);
-
   this.player.addXP(xpPercentage);
   this.experienceAnimationNeeded = true;
 
   if (this.player.level > oldLevel) {
-    var s = $('<select />');
-
-    for (var i = this.player.level; i > 0 && i > this.player.level - 4; i--) {
-      $('<option />', {value: i, text: i}).appendTo(s);
-    }
-
     this.enemyLevel = this.player.level;
-    s.val(this.player.level);
-    s.change(function() { window.game.setEnemyLevel(parseInt($(this).val())) });
-    $('#enemyLevelDropdownContainer').html(s);
-    $('#enemyLevelContainer').show();
   }
 
   var loot = drops[2];

@@ -57,7 +57,7 @@ Enemy.prototype.dropLoot = function() {
   var multiplier = this.level * (this.difficulty + 1);
   var money =  multiplier + Math.round(multiplier * Math.random());
 
-  var xpPercentage = (this.difficulty + 2) * (40 + 10 * Math.random()) / (this.level + 4);
+  var xpPercentage = (this.difficulty + 2) * (20 + 10 * Math.random()) / (this.level + 4);
 
   var rand = Math.random();
   var numItemsToDrop = (this.difficulty == Quality.Poor && rand < 0.3) ? 0 : 1;
